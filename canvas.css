@@ -1,0 +1,27 @@
+﻿html {
+	padding : 10px;
+	margin : 0px;
+}
+
+.contents-container {
+	width : 540px;
+	padding : 10px;
+	margin : 0px;
+	background-color : #ecd9ec;
+}
+
+.canvas-container {
+	width : 540px;
+	height : auto;
+	background-color : #8ee;
+}
+
+.my-canvas {
+	margin : 20px;
+}
+
+h1 {
+	width : 540px;
+	color : #545454;
+	text-align : center;
+}
