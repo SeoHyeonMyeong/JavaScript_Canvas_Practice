@@ -18,6 +18,7 @@
 
 .my-canvas {
 	margin : 20px;
+	border : 1px solid black;
 }
 
 h1 {
