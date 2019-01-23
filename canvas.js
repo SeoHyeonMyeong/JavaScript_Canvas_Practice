@@ -50,31 +50,39 @@ CanvasManager.prototype.drawImage = function() {	// 이미지 그리기
 	},false);
 	img.src = 'images/Stitch.jpg';
 }
-// Rectangle.js
 
-var input = {
+// Move.js
+var input = {	// 키 눌려있는 상태
 	up : false,
 	down : false,
 	right : false,
 	left : false,
+	space : false,
 	quit : false,
 };
 
 var updateInterval;
 
-function Rectangle(canvas,x,y) {
+function Stitch(canvas,x,y) {	// 스티치
 	var self = this;
 	this.canvas = canvas;
 	this.canvasCtx = this.canvas.getContext('2d');
 	this.x = x;
 	this.y = y;
+	this.width = 80;
+	this.height = 96;
 	this.sticks=0;
-	
+	this.delay = 1000;
+	this.deltaTime = 1000;
+	this.time = performance.now();
+
+
 	this.addKeyDownEvent();
+	this.arrow = [];
 	this.draw();
 }
 
-Rectangle.prototype.addKeyDownEvent = function() {
+Stitch.prototype.addKeyDownEvent = function() {		// 키 눌렀을때 이벤트
 	var self = this;
 	document.addEventListener("keydown",function(e) {
 		if(e.key==="ArrowUp"){
@@ -91,10 +99,14 @@ Rectangle.prototype.addKeyDownEvent = function() {
 		}
 		if(e.key==="q"){
 			input.quit = true;
+			self.update();
 		}
-		self.update();
+		if(e.key===" "){
+			input.space = true;
+		}
+		
 	});	
-	document.addEventListener("keyup",function(e) {
+	document.addEventListener("keyup",function(e) {		// 키를 떼었을때 이벤트
 		if(e.key==="ArrowUp"){
 			input.up = false;
 		}
@@ -107,12 +119,15 @@ Rectangle.prototype.addKeyDownEvent = function() {
 		if(e.key==="ArrowRight"){
 			input.right = false;
 		}
+		if(e.key===" ") {
+			input.space = false;
+		}
 	});
 }
 
 
 
-Rectangle.prototype.draw = function() {
+Stitch.prototype.draw = function() {	// 객체 그리기
 	var self = this;
 	this.canvasCtx.fillStyle = "rgba(255,255,255,1)";
 	this.canvasCtx.fillRect(0,0,500,500);
@@ -122,22 +137,78 @@ Rectangle.prototype.draw = function() {
 	if(input.left&&this.x>=14) this.x-=4;
 	var img = new Image();
 	img.src = 'images/Stitch.jpg';
-	self.canvasCtx.drawImage(img,self.x,self.y,100,100);
+	self.canvasCtx.drawImage(img,self.x,self.y,self.width,self.height);
 	
 }
 
-Rectangle.prototype.update = function() {
+Stitch.prototype.checkArrow = function() {	// 시간이 지났다면 하나 생성
 	var self = this;
-	if(input.quit) {
-		window.clearInterval(updateInterval);
+	this.deltaTime = performance.now() - this.time;
+	var randomX = Math.floor(Math.random()*50);
+	var randomY = self.y+self.height/2-18;
+	if(input.space&&this.delay<this.deltaTime){
+		this.time = performance.now();
+		this.arrow.push(new Arrow(randomX,randomY));
 	}
 }
 
+Stitch.prototype.checkCollision = function() {
+	var self = this;
+	self.arrow.forEach(function (instance) {
+		var condition1 = self.x+self.width>instance.x && self.x<instance.x && self.y+self.height>instance.y && self.y<instance.y;
+		var condition2 = self.x<instance.x+instance.width && self.x+self.width>instance.x+instance.width && self.y+self.height>instance.y && self.y< instance.y;
+		var condition3 = self.x+self.width>instance.x && self.x < instance.x && self.y < instance.y + instance.height && self.y+self.height > instance.y+instance.height;
+		var condition4 = self.x<instance.x+instance.width && self.x+self.width > instance.x + instance.width && self.y < instance.y + instance.height && self.y + self.height > instance.y + instance.height;
+		if(condition1 || condition2 || condition3 || condition4){
+			alert("충돌");
+		}
+	});
+}
+
+Stitch.prototype.update = function() {	//	업데이트
+	var self = this;
+	self.checkArrow();
+	self.checkCollision();
+	if(input.quit) {
+		window.clearInterval(updateInterval);
+	}
+	self.draw();
+	self.arrow.forEach(function (instance){
+		instance.draw();
+	});
+}
+
+// arrow.js
+
+function Arrow(x,y) {
+	this.canvas = document.querySelector('.my-canvas');
+	this.canvasCtx = this.canvas.getContext('2d');
+	this.x = x;
+	this.y = y;
+	this.width = 30;
+	this.height = 36;
+	this.deltaTime;
+	this.time = performance.now();
+}
+
+Arrow.prototype.draw = function() {
+	var self = this;
+	self.deltaTime = performance.now() - self.time;
+	self.time = performance.now();
+	self.x += Math.floor(self.deltaTime * 0.3);
+	var img = new Image();
+	img.src = 'images/Stitch.jpg';
+	self.canvasCtx.drawImage(img,self.x,self.y,self.width,self.height);
+}
+
+
+
 // application.js
-var rectangle;
+var stitch;
 document.addEventListener("DOMContentLoaded",function() {	// 로드시 이벤트
 	var canvas = document.querySelector('.my-canvas');
 	var manager = new CanvasManager(canvas);
-	rectangle = new Rectangle(canvas,10,10);
-	updateInterval = window.setInterval("rectangle.draw()",30);	
+	stitch = new Stitch(canvas,10,10);
+	updateInterval = window.setInterval("stitch.update()",30);	// 0.03초마다 스티치 드로우
+		
 });
