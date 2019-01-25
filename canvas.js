@@ -72,13 +72,16 @@ function Stitch(canvas,x,y) {	// 스티치
 	this.width = 80;
 	this.height = 96;
 	this.sticks=0;
-	this.delay = 1000;
+	this.delay = 500;
 	this.deltaTime = 1000;
 	this.time = performance.now();
-
+	this.spawnDelay = 1000;
+	this.spawnDeltaTime = 0;
+	this.spawnTime = performance.now();
 
 	this.addKeyDownEvent();
 	this.arrow = [];
+	this.monster = [];
 	this.draw();
 }
 
@@ -131,10 +134,10 @@ Stitch.prototype.draw = function() {	// 객체 그리기
 	var self = this;
 	this.canvasCtx.fillStyle = "rgba(255,255,255,1)";
 	this.canvasCtx.fillRect(0,0,500,500);
-	if(input.up&&this.y>=14) this.y-=4;
-	if(input.down&&this.y<=386) this.y+=4;
-	if(input.right&&this.x<=386) this.x+=4;
-	if(input.left&&this.x>=14) this.x-=4;
+	if(input.up&&this.y>=14) this.y-=6;
+	if(input.down&&this.y<=386) this.y+=6;
+	if(input.right&&this.x<=386) this.x+=6;
+	if(input.left&&this.x>=14) this.x-=6;
 	var img = new Image();
 	img.src = 'images/Stitch.jpg';
 	self.canvasCtx.drawImage(img,self.x,self.y,self.width,self.height);
@@ -152,27 +155,54 @@ Stitch.prototype.checkArrow = function() {	// 시간이 지났다면 하나 생�
 	}
 }
 
-Stitch.prototype.checkCollision = function() {
+Stitch.prototype.checkMonster = function() {	// 시간이 지나면 몬스터 생성
 	var self = this;
-	self.arrow.forEach(function (instance) {
+	this.spawnDeltaTime = performance.now() - this.spawnTime;
+	var randomX = 450 + Math.floor(Math.random()*50);
+	var randomY = Math.floor(Math.random()*500);
+	var randomName = Math.random()>0.8? "slime":"snail";
+	if(this.spawnDelay<this.spawnDeltaTime){
+		this.spawnTime = performance.now();
+		this.monster.push(new Monster(randomX,randomY,randomName));
+	}
+}
+
+Stitch.prototype.checkCollision = function() {	// 몬스터와 스티치 충돌 이벤트
+	var self = this;
+	var n = 0;
+	self.monster.forEach(function (instance) {
 		var condition1 = self.x+self.width>instance.x && self.x<instance.x && self.y+self.height>instance.y && self.y<instance.y;
 		var condition2 = self.x<instance.x+instance.width && self.x+self.width>instance.x+instance.width && self.y+self.height>instance.y && self.y< instance.y;
 		var condition3 = self.x+self.width>instance.x && self.x < instance.x && self.y < instance.y + instance.height && self.y+self.height > instance.y+instance.height;
 		var condition4 = self.x<instance.x+instance.width && self.x+self.width > instance.x + instance.width && self.y < instance.y + instance.height && self.y + self.height > instance.y + instance.height;
 		if(condition1 || condition2 || condition3 || condition4){
-			alert("충돌");
+			input.quit = true;
 		}
+		instance.checkCollision(self.arrow);
+		self.monsterHpCheck(n);
+		n++;
 	});
+}
+
+Stitch.prototype.monsterHpCheck = function(n) {	// 죽었다면 제거
+	var self = this;
+	if(self.monster[n].hp<=0){
+		self.monster.splice(n,1);
+	}
 }
 
 Stitch.prototype.update = function() {	//	업데이트
 	var self = this;
 	self.checkArrow();
+	self.checkMonster();
 	self.checkCollision();
 	if(input.quit) {
 		window.clearInterval(updateInterval);
 	}
 	self.draw();
+	self.monster.forEach(function (instance){
+		instance.draw();
+	});
 	self.arrow.forEach(function (instance){
 		instance.draw();
 	});
@@ -185,8 +215,8 @@ function Arrow(x,y) {
 	this.canvasCtx = this.canvas.getContext('2d');
 	this.x = x;
 	this.y = y;
-	this.width = 30;
-	this.height = 36;
+	this.width = 20;
+	this.height = 20;
 	this.deltaTime;
 	this.time = performance.now();
 }
@@ -197,10 +227,71 @@ Arrow.prototype.draw = function() {
 	self.time = performance.now();
 	self.x += Math.floor(self.deltaTime * 0.3);
 	var img = new Image();
-	img.src = 'images/Stitch.jpg';
+	img.src = 'images/Star.png';
 	self.canvasCtx.drawImage(img,self.x,self.y,self.width,self.height);
 }
 
+// monster.js
+
+function Monster(x,y,name) {
+	this.canvas = document.querySelector('.my-canvas');
+	this.canvasCtx = this.canvas.getContext('2d');
+	this.x = x;
+	this.y = y;
+	this.name = name;
+	this.delay = 500;
+	this.deltaTime = 1000;
+	this.time = performance.now();
+	
+	this.init();
+}
+
+Monster.prototype.init = function() {
+	switch(this.name) {
+		case "slime" :
+			this.width = 103;
+			this.height = 72;
+			this.hp = 100;
+			break;
+		case "snail" :
+			this.width = 42;
+			this.height = 33;
+			this.hp = 30;
+			break;
+		default :
+			this.width = 42;
+			this.height = 33;
+			this.hp = 30;
+			this.name = "snail";
+	}
+}
+
+Monster.prototype.checkCollision = function(arrow) {	// 몬스터와 화살 충돌 이벤트
+	var self = this;
+	var n =0;
+	arrow.forEach(function (instance) {
+		var condition1 = self.x+self.width>instance.x && self.x<instance.x && self.y+self.height>instance.y && self.y<instance.y;
+		var condition2 = self.x<instance.x+instance.width && self.x+self.width>instance.x+instance.width && self.y+self.height>instance.y && self.y< instance.y;
+		var condition3 = self.x+self.width>instance.x && self.x < instance.x && self.y < instance.y + instance.height && self.y+self.height > instance.y+instance.height;
+		var condition4 = self.x<instance.x+instance.width && self.x+self.width > instance.x + instance.width && self.y < instance.y + instance.height && self.y + self.height > instance.y + instance.height;
+		if(condition1 || condition2 || condition3 || condition4){
+			self.hp-=40;
+			arrow.splice(n,1);
+		}
+		n++;
+	});
+
+}
+
+Monster.prototype.draw = function() {
+	var self = this;
+	self.deltaTime = performance.now() - self.time;
+	self.time = performance.now();
+	self.x -= Math.floor(self.deltaTime * 0.1);
+	var img = new Image();
+	img.src = 'images/'+self.name+'.png';
+	self.canvasCtx.drawImage(img,self.x,self.y,self.width,self.height);
+}
 
 
 // application.js
