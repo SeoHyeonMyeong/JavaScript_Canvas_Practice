@@ -72,7 +72,7 @@ function Stitch(canvas,x,y) {	// 스티치
 	this.width = 80;
 	this.height = 96;
 	this.sticks=0;
-	this.delay = 500;
+	this.delay = 300;
 	this.deltaTime = 1000;
 	this.time = performance.now();
 	this.spawnDelay = 1000;
@@ -147,11 +147,18 @@ Stitch.prototype.draw = function() {	// 객체 그리기
 Stitch.prototype.checkArrow = function() {	// 시간이 지났다면 하나 생성
 	var self = this;
 	this.deltaTime = performance.now() - this.time;
-	var randomX = Math.floor(Math.random()*50);
-	var randomY = self.y+self.height/2-18;
+	var randomX = self.x+self.width/2-10;
+	var randomY = self.y+self.height/2-10;
+	var vy = 0;
+	var g = 0;
+	if(Math.random()>0){
+		vy = -6;
+		g = 0.2;
+	}
+	var vx = 4;
 	if(input.space&&this.delay<this.deltaTime){
 		this.time = performance.now();
-		this.arrow.push(new Arrow(randomX,randomY));
+		this.arrow.push(new Arrow(randomX,randomY,vx,vy,g));
 	}
 }
 
@@ -210,22 +217,23 @@ Stitch.prototype.update = function() {	//	업데이트
 
 // arrow.js
 
-function Arrow(x,y) {
+function Arrow(x,y,vx,vy,g) {
 	this.canvas = document.querySelector('.my-canvas');
 	this.canvasCtx = this.canvas.getContext('2d');
 	this.x = x;
 	this.y = y;
+	this.vx = vx;
+	this.vy = vy;
+	this.g = g;
 	this.width = 20;
 	this.height = 20;
-	this.deltaTime;
-	this.time = performance.now();
 }
 
 Arrow.prototype.draw = function() {
 	var self = this;
-	self.deltaTime = performance.now() - self.time;
-	self.time = performance.now();
-	self.x += Math.floor(self.deltaTime * 0.3);
+	self.vy += self.g;
+	self.x += self.vx;
+	self.y += self.vy;
 	var img = new Image();
 	img.src = 'images/Star.png';
 	self.canvasCtx.drawImage(img,self.x,self.y,self.width,self.height);
@@ -238,11 +246,9 @@ function Monster(x,y,name) {
 	this.canvasCtx = this.canvas.getContext('2d');
 	this.x = x;
 	this.y = y;
+	this.vx = -1.5;
 	this.name = name;
-	this.delay = 500;
-	this.deltaTime = 1000;
-	this.time = performance.now();
-	
+
 	this.init();
 }
 
@@ -252,16 +258,19 @@ Monster.prototype.init = function() {
 			this.width = 103;
 			this.height = 72;
 			this.hp = 100;
+			this.vx = -1.5;
 			break;
 		case "snail" :
 			this.width = 42;
 			this.height = 33;
 			this.hp = 30;
+			this.vx = -2;
 			break;
 		default :
 			this.width = 42;
 			this.height = 33;
 			this.hp = 30;
+			this.vs = -2;
 			this.name = "snail";
 	}
 }
@@ -285,9 +294,7 @@ Monster.prototype.checkCollision = function(arrow) {	// 몬스터와 화살 충�
 
 Monster.prototype.draw = function() {
 	var self = this;
-	self.deltaTime = performance.now() - self.time;
-	self.time = performance.now();
-	self.x -= Math.floor(self.deltaTime * 0.1);
+	self.x += self.vx 
 	var img = new Image();
 	img.src = 'images/'+self.name+'.png';
 	self.canvasCtx.drawImage(img,self.x,self.y,self.width,self.height);
@@ -300,6 +307,6 @@ document.addEventListener("DOMContentLoaded",function() {	// 로드시 이벤트
 	var canvas = document.querySelector('.my-canvas');
 	var manager = new CanvasManager(canvas);
 	stitch = new Stitch(canvas,10,10);
-	updateInterval = window.setInterval("stitch.update()",30);	// 0.03초마다 스티치 드로우
+	updateInterval = window.setInterval("stitch.update()",1000/60);	// 0.03초마다 스티치 드로우
 		
 });
