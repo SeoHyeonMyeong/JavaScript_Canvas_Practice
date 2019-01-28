@@ -61,6 +61,15 @@ var input = {	// 키 눌려있는 상태
 	quit : false,
 };
 
+function inputReset() {	// 인풋 초기화
+	input.up = false;
+	input.down = false;
+	input.right = false;
+	input.left = false;
+	input.space = false;
+	input.quit = false;
+}
+
 var updateInterval;
 
 function Stitch(canvas,x,y) {	// 스티치
@@ -71,7 +80,9 @@ function Stitch(canvas,x,y) {	// 스티치
 	this.y = y;
 	this.width = 80;
 	this.height = 96;
-	this.sticks=0;
+	this.score = 0;
+	this.gold = 0;
+	this.damage = 40;
 	this.delay = 300;
 	this.deltaTime = 1000;
 	this.time = performance.now();
@@ -85,10 +96,8 @@ function Stitch(canvas,x,y) {	// 스티치
 	this.draw();
 }
 
-Stitch.prototype.addKeyDownEvent = function() {		// 키 눌렀을때 이벤트
-	var self = this;
-	document.addEventListener("keydown",function(e) {
-		if(e.key==="ArrowUp"){
+function keyDownEvent(e) {	// 키다운 이벤트
+	if(e.key==="ArrowUp"){
 			input.up = true;
 		}
 		if(e.key==="ArrowDown"){
@@ -102,15 +111,14 @@ Stitch.prototype.addKeyDownEvent = function() {		// 키 눌렀을때 이벤트
 		}
 		if(e.key==="q"){
 			input.quit = true;
-			self.update();
 		}
 		if(e.key===" "){
 			input.space = true;
 		}
-		
-	});	
-	document.addEventListener("keyup",function(e) {		// 키를 떼었을때 이벤트
-		if(e.key==="ArrowUp"){
+}
+
+function keyUpEvent(e) {	// 키업 이벤트
+	if(e.key==="ArrowUp"){
 			input.up = false;
 		}
 		if(e.key==="ArrowDown"){
@@ -125,10 +133,57 @@ Stitch.prototype.addKeyDownEvent = function() {		// 키 눌렀을때 이벤트
 		if(e.key===" ") {
 			input.space = false;
 		}
-	});
 }
 
+function clickEvent(e) {	// 클릭 이벤트
+	var x = e.clientX;
+	var y = e.clientY;
+	console.log(x);
+	console.log(y);
+	if(x>71&&x<155&&y>252&&y<279){
+		stitch.reStart();
+	}
+	if(x>71&&x<370&&y>303&&y<331){
+		if(stitch.damage*100<=stitch.gold){
+			stitch.gold -= stitch.damage*100;
+			stitch.damage+=20;
+			stitch.showMenu();
+			
+		}
+	}
+}
 
+Stitch.prototype.reStart = function(){
+	var self = this;
+	self.x = 10;
+	self.y = 10;
+	self.monster = [];
+	self.arrow = [];
+	updateInterval = window.setInterval("stitch.update()",1000/60);
+	self.removeClickEvent();
+	self.addKeyDownEvent();
+
+}
+
+Stitch.prototype.addKeyDownEvent = function() {		// 키 눌렀을때 이벤트
+	var self = this;
+	document.addEventListener("keydown",keyDownEvent,false);
+	document.addEventListener("keyup",keyUpEvent,false);
+}
+
+Stitch.prototype.removeKeyDownEvent = function() {	// 이벤트 삭제
+	document.removeEventListener("keydown",keyDownEvent);
+	document.removeEventListener("keyup",keyUpEvent);
+}
+
+Stitch.prototype.addClickEvent = function() {
+	var self = this;
+	document.addEventListener("click",clickEvent,false);
+}
+
+Stitch.prototype.removeClickEvent = function() {
+	document.removeEventListener("click",clickEvent);
+}
 
 Stitch.prototype.draw = function() {	// 객체 그리기
 	var self = this;
@@ -144,7 +199,7 @@ Stitch.prototype.draw = function() {	// 객체 그리기
 	
 }
 
-Stitch.prototype.checkArrow = function() {	// 시간이 지났다면 하나 생성
+Stitch.prototype.checkArrow = function() {	// 시간이 지났다면 화살 생성
 	var self = this;
 	this.deltaTime = performance.now() - this.time;
 	var randomX = self.x+self.width/2-10;
@@ -158,7 +213,7 @@ Stitch.prototype.checkArrow = function() {	// 시간이 지났다면 하나 생�
 	var vx = 4;
 	if(input.space&&this.delay<this.deltaTime){
 		this.time = performance.now();
-		this.arrow.push(new Arrow(randomX,randomY,vx,vy,g));
+		this.arrow.push(new Arrow(randomX,randomY,vx,vy,g,self.damage));
 	}
 }
 
@@ -167,7 +222,7 @@ Stitch.prototype.checkMonster = function() {	// 시간이 지나면 몬스터 �
 	this.spawnDeltaTime = performance.now() - this.spawnTime;
 	var randomX = 450 + Math.floor(Math.random()*50);
 	var randomY = Math.floor(Math.random()*500);
-	var randomName = Math.random()>0.8? "slime":"snail";
+	var randomName = Math.random()>0.8? "Slime":"Snail";
 	if(this.spawnDelay<this.spawnDeltaTime){
 		this.spawnTime = performance.now();
 		this.monster.push(new Monster(randomX,randomY,randomName));
@@ -194,8 +249,44 @@ Stitch.prototype.checkCollision = function() {	// 몬스터와 스티치 충돌 
 Stitch.prototype.monsterHpCheck = function(n) {	// 죽었다면 제거
 	var self = this;
 	if(self.monster[n].hp<=0){
+		self.score += self.monster[n].maxHp;
 		self.monster.splice(n,1);
-	}
+	} 
+}
+
+Stitch.prototype.drawScore = function() {	// 점수 출력
+	var self = this;
+	this.canvasCtx.font = "16px Arial";
+	this.canvasCtx.fillStyle = "#0095DD";
+	this.canvasCtx.fillText("Score: " + self.score,8,20);
+
+}
+
+Stitch.prototype.quit = function() {	// quit 눌렷을시
+	var self = this;
+	inputReset();
+	window.clearInterval(updateInterval); 	// 인터벌 제거
+	self.removeKeyDownEvent();
+	self.gold += self.score;
+	self.score = 0;
+	self.showMenu();
+}
+
+Stitch.prototype.showMenu = function() {	// 메뉴 출력
+	var self = this;
+	this.addClickEvent();
+	this.canvasCtx.fillStyle = "rgba(255,255,255,1)";
+	this.canvasCtx.fillRect(0,0,500,500);
+	this.canvasCtx.font = "30px Arial";
+	this.canvasCtx.fillStyle = "#008899";
+	this.canvasCtx.fillText("메뉴",20,40);
+	this.canvasCtx.fillStyle = "#880099";
+	this.canvasCtx.fillText("Gold: " + self.gold,20,90);
+	this.canvasCtx.fillStyle = "#998800";
+	this.canvasCtx.fillText("재시작",20,140);
+	this.canvasCtx.fillStyle = "#666666";
+	this.canvasCtx.fillText("공격력: " + self.damage + " (cost: " + self.damage*100 + ")",20,190);
+	
 }
 
 Stitch.prototype.update = function() {	//	업데이트
@@ -203,9 +294,7 @@ Stitch.prototype.update = function() {	//	업데이트
 	self.checkArrow();
 	self.checkMonster();
 	self.checkCollision();
-	if(input.quit) {
-		window.clearInterval(updateInterval);
-	}
+	
 	self.draw();
 	self.monster.forEach(function (instance){
 		instance.draw();
@@ -213,23 +302,29 @@ Stitch.prototype.update = function() {	//	업데이트
 	self.arrow.forEach(function (instance){
 		instance.draw();
 	});
+	self.drawScore();
+	if(input.quit) {
+		self.quit();
+	}
 }
+
 
 // arrow.js
 
-function Arrow(x,y,vx,vy,g) {
+function Arrow(x,y,vx,vy,g,damage) {	// 화살
 	this.canvas = document.querySelector('.my-canvas');
 	this.canvasCtx = this.canvas.getContext('2d');
 	this.x = x;
 	this.y = y;
 	this.vx = vx;
 	this.vy = vy;
+	this.damage = damage;
 	this.g = g;
 	this.width = 20;
 	this.height = 20;
 }
 
-Arrow.prototype.draw = function() {
+Arrow.prototype.draw = function() {	// 화살 그리기
 	var self = this;
 	self.vy += self.g;
 	self.x += self.vx;
@@ -241,7 +336,7 @@ Arrow.prototype.draw = function() {
 
 // monster.js
 
-function Monster(x,y,name) {
+function Monster(x,y,name) {	// 몬스터
 	this.canvas = document.querySelector('.my-canvas');
 	this.canvasCtx = this.canvas.getContext('2d');
 	this.x = x;
@@ -252,27 +347,58 @@ function Monster(x,y,name) {
 	this.init();
 }
 
-Monster.prototype.init = function() {
+Monster.prototype.init = function() {	// 초기화
 	switch(this.name) {
-		case "slime" :
-			this.width = 103;
-			this.height = 72;
-			this.hp = 100;
+		case "Slime" :
+			this.width = 69;
+			this.height = 47;
+			this.maxHp = 100;
 			this.vx = -1.5;
 			break;
-		case "snail" :
+		case "Snail" :
 			this.width = 42;
 			this.height = 33;
-			this.hp = 30;
+			this.maxHp = 30;
+			this.vx = -2;
+			break;
+		case "Resh" :
+			this.width = 65;
+			this.height = 56;
+			this.maxHp = 200;
+			this.vx = -2;
+			break;
+		case "Harf" :
+			this.width = 73;
+			this.height = 96;
+			this.maxHp = 300;
+			this.vx = -2;
+			break;
+		case "Threetale" :
+			this.width = 95;
+			this.height = 75;
+			this.maxHp = 500;
+			this.vx = -2;
+			break;
+		case "DualBurk" :
+			this.width = 93;
+			this.height = 70;
+			this.maxHp = 600;
+			this.vx = -2;
+			break;
+		case "Ghost" :
+			this.width = 42;
+			this.height = 33;
+			this.maxHp = 700;
 			this.vx = -2;
 			break;
 		default :
-			this.width = 42;
-			this.height = 33;
-			this.hp = 30;
+			this.width = 67;
+			this.height = 92;
+			this.maxHp = 30;
 			this.vs = -2;
 			this.name = "snail";
 	}
+	this.hp = this.maxHp;
 }
 
 Monster.prototype.checkCollision = function(arrow) {	// 몬스터와 화살 충돌 이벤트
@@ -284,7 +410,7 @@ Monster.prototype.checkCollision = function(arrow) {	// 몬스터와 화살 충�
 		var condition3 = self.x+self.width>instance.x && self.x < instance.x && self.y < instance.y + instance.height && self.y+self.height > instance.y+instance.height;
 		var condition4 = self.x<instance.x+instance.width && self.x+self.width > instance.x + instance.width && self.y < instance.y + instance.height && self.y + self.height > instance.y + instance.height;
 		if(condition1 || condition2 || condition3 || condition4){
-			self.hp-=40;
+			self.hp-= instance.damage;
 			arrow.splice(n,1);
 		}
 		n++;
@@ -292,7 +418,7 @@ Monster.prototype.checkCollision = function(arrow) {	// 몬스터와 화살 충�
 
 }
 
-Monster.prototype.draw = function() {
+Monster.prototype.draw = function() {	// 몬스터 그리기
 	var self = this;
 	self.x += self.vx 
 	var img = new Image();
