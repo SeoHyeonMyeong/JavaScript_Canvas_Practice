@@ -1,57 +1,5 @@
-﻿// canvas.js
-function CanvasManager(canvas) {
-	this.canvas = canvas;
-	if (this.canvas.getContext){
-  		this.canvasCtx = this.canvas.getContext('2d');
-	} 
-	else {
- 		alert("캔버스를 지원하지 않습니다.");
-	}
-	this.setup();
-	this.drawRect();
-	this.drawTriangle();
-	this.drawCircle();
-	this.drawImage();
-}
+﻿// Input.js
 
-CanvasManager.prototype.setup = function() {	// 캔버스를 흰색으로 색칠
-	this.canvasCtx.fillStyle = "#fff";
-	this.canvasCtx.fillRect(0,0,500,500);
-}
-
-CanvasManager.prototype.drawRect = function() {	// 사각형 두개 그리기
-	this.canvasCtx.fillStyle = "rgba(200,0,0,0.5)";
-	this.canvasCtx.fillRect(10,10,50,50);
-	this.canvasCtx.fillStyle = "rgba(0,0,200,0.5)";
-	this.canvasCtx.fillRect(30,30,50,50);
-	
-}
-
-CanvasManager.prototype.drawTriangle = function() {	// 삼각형 두개 그리기
-	var x1 = new Path2D('M110 10 h 80 v 80 Z');
-	var x2 = new Path2D('M100 20 v 80 h 80 Z');
-	this.canvasCtx.fillStyle = "rgb(0,0,0)";
-	this.canvasCtx.fill(x1);
-	this.canvasCtx.stroke(x2);
-}
-
-CanvasManager.prototype.drawCircle = function() {	// 원 그리기
-	this.canvasCtx.fillStyle = "rgba(100,200,200,0.8)";
-	this.canvasCtx.beginPath();
-	this.canvasCtx.ellipse(70,170,50,50,0,0,2*Math.PI);
-	this.canvasCtx.fill();
-}
-
-CanvasManager.prototype.drawImage = function() {	// 이미지 그리기
-	var self = this;
-	var img = new Image();
-	img.addEventListener("load",function(){
-		self.canvasCtx.drawImage(img,300,10,100,100);
-	},false);
-	img.src = 'images/Stitch.jpg';
-}
-
-// Move.js
 var input = {	// 키 눌려있는 상태
 	up : false,
 	down : false,
@@ -68,32 +16,6 @@ function inputReset() {	// 인풋 초기화
 	input.left = false;
 	input.space = false;
 	input.quit = false;
-}
-
-var updateInterval;
-
-function Stitch(canvas,x,y) {	// 스티치
-	var self = this;
-	this.canvas = canvas;
-	this.canvasCtx = this.canvas.getContext('2d');
-	this.x = x;
-	this.y = y;
-	this.width = 80;
-	this.height = 96;
-	this.score = 0;
-	this.gold = 0;
-	this.damage = 40;
-	this.delay = 300;
-	this.deltaTime = 1000;
-	this.time = performance.now();
-	this.spawnDelay = 1000;
-	this.spawnDeltaTime = 0;
-	this.spawnTime = performance.now();
-
-	this.addKeyDownEvent();
-	this.arrow = [];
-	this.monster = [];
-	this.draw();
 }
 
 function keyDownEvent(e) {	// 키다운 이벤트
@@ -140,70 +62,120 @@ function clickEvent(e) {	// 클릭 이벤트
 	var y = e.clientY;
 	console.log(x);
 	console.log(y);
-	if(x>71&&x<155&&y>252&&y<279){
-		stitch.reStart();
+	if(x>71&&x<155&&y>252&&y<279){	// 재시작
+		manager.reStart();
 	}
-	if(x>71&&x<370&&y>303&&y<331){
-		if(stitch.damage*100<=stitch.gold){
-			stitch.gold -= stitch.damage*100;
-			stitch.damage+=20;
-			stitch.showMenu();
+	if(x>71&&x<370&&y>303&&y<331){	// 데미지 증가
+		if(manager.damage*10<=manager.gold){
+			manager.gold -= manager.damage*10;
+			manager.damage+=10;
+			manager.showMenu();
 			
 		}
 	}
+	if(x>71&&x<359&&y>353&&y<381){	// 속도 증가
+		if(Math.floor(100000/manager.arrowDelay)<=manager.gold){
+			manager.gold -= Math.floor(100000/manager.arrowDelay);
+			manager.arrowDelay -= 40;
+			manager.showMenu();
+			
+		}
+	}
+	if(x>352&&x<373&&y>405&&y<425){	// 난이도 상승
+		if(manager.difficulty<39){
+			manager.difficulty++;
+			manager.showMenu();
+			
+		}
+	}
+	if(x>391&&x<411&&y>405&&y<425){	// 난이도 하락
+		if(manager.difficulty>1){
+			manager.difficulty--;
+			manager.showMenu();
+			
+		}
+	}
+	
 }
 
-Stitch.prototype.reStart = function(){
+var updateInterval;	// 인터벌
+
+// Canvas.js
+function CanvasManager() {
+	this.canvas = document.querySelector('.my-canvas');
+	this.canvasCtx = this.canvas.getContext('2d');
+	this.difficulty = 1; // 난이도 1
+	this.score = 0;	// 스코어 0
+	this.gold = 0;	// 골드 0
+	this.damage = 40;	// 데미지 40
+	this.arrowDelay = 1000;	// 화살 딜레이
+	this.arrowDeltaTime = 0;	// 화살 델타타임
+	this.arrowTime = performance.now(); // 화살 시간
+	this.monster1 = "Snail";
+	this.monster2 = "Slime";
+	this.spawnDelay = 1000;	// 몬스터 딜레이
+	this.spawnDeltaTime = 0;	// 몬스터 델타타임
+	this.spawnTime = performance.now();	// 몬스터 시간
+	this.character = new Character(20,20);
+	this.arrow = [];
+	this.monster = [];
+	this.init();
+}
+
+CanvasManager.prototype.init = function() {	// 캐릭터를 만들고 인터벌을 설정한다.
 	var self = this;
-	self.x = 10;
-	self.y = 10;
-	self.monster = [];
-	self.arrow = [];
-	updateInterval = window.setInterval("stitch.update()",1000/60);
-	self.removeClickEvent();
-	self.addKeyDownEvent();
+	this.addKeyEvent();	// 키 이벤트 추가
+	updateInterval = window.setInterval("manager.update()",1000/60);	// 업데이트 인터벌 실행
 
 }
 
-Stitch.prototype.addKeyDownEvent = function() {		// 키 눌렀을때 이벤트
+CanvasManager.prototype.update = function() {	// 업데이트
 	var self = this;
+	self.checkArrow();	// 화살 확인
+	self.checkMonster();	// 몬스터 확인
+	self.checkCollision();	// 충돌 확인
+	
+	// 그리기
+	self.canvasCtx.fillStyle = "rgba(255,255,255,1)";
+	self.canvasCtx.fillRect(0,0,500,500);
+	self.character.draw();
+	self.monster.forEach(function (instance){
+		instance.draw();
+	});
+	self.arrow.forEach(function (instance){
+		instance.draw();
+	});
+	self.drawScore();
+	
+	// 종료
+	if(input.quit) {
+		self.quit();
+	}
+}
+
+CanvasManager.prototype.addKeyEvent = function() {		// 키 이벤트 추가
 	document.addEventListener("keydown",keyDownEvent,false);
 	document.addEventListener("keyup",keyUpEvent,false);
 }
 
-Stitch.prototype.removeKeyDownEvent = function() {	// 이벤트 삭제
+CanvasManager.prototype.removeKeyDownEvent = function() {	// 키 이벤트 삭제
 	document.removeEventListener("keydown",keyDownEvent);
 	document.removeEventListener("keyup",keyUpEvent);
 }
 
-Stitch.prototype.addClickEvent = function() {
-	var self = this;
+CanvasManager.prototype.addClickEvent = function() {	// 클릭 이벤트 추가
 	document.addEventListener("click",clickEvent,false);
 }
 
-Stitch.prototype.removeClickEvent = function() {
+CanvasManager.prototype.removeClickEvent = function() {	// 클릭 이벤트 삭제
 	document.removeEventListener("click",clickEvent);
 }
 
-Stitch.prototype.draw = function() {	// 객체 그리기
+CanvasManager.prototype.checkArrow = function() {	// 시간이 지났다면 화살 생성
 	var self = this;
-	this.canvasCtx.fillStyle = "rgba(255,255,255,1)";
-	this.canvasCtx.fillRect(0,0,500,500);
-	if(input.up&&this.y>=14) this.y-=6;
-	if(input.down&&this.y<=386) this.y+=6;
-	if(input.right&&this.x<=386) this.x+=6;
-	if(input.left&&this.x>=14) this.x-=6;
-	var img = new Image();
-	img.src = 'images/Stitch.jpg';
-	self.canvasCtx.drawImage(img,self.x,self.y,self.width,self.height);
-	
-}
-
-Stitch.prototype.checkArrow = function() {	// 시간이 지났다면 화살 생성
-	var self = this;
-	this.deltaTime = performance.now() - this.time;
-	var randomX = self.x+self.width/2-10;
-	var randomY = self.y+self.height/2-10;
+	this.arrowDeltaTime = performance.now() - this.arrowTime;
+	var randomX = self.character.x+self.character.width/2-10;
+	var randomY = self.character.y+self.character.height/2-10;
 	var vy = 0;
 	var g = 0;
 	if(Math.random()>0){
@@ -211,42 +183,43 @@ Stitch.prototype.checkArrow = function() {	// 시간이 지났다면 화살 생�
 		g = 0.2;
 	}
 	var vx = 4;
-	if(input.space&&this.delay<this.deltaTime){
-		this.time = performance.now();
+	if(input.space&&this.arrowDelay<this.arrowDeltaTime){
+		this.arrowTime = performance.now();
 		this.arrow.push(new Arrow(randomX,randomY,vx,vy,g,self.damage));
 	}
 }
 
-Stitch.prototype.checkMonster = function() {	// 시간이 지나면 몬스터 생성
+CanvasManager.prototype.checkMonster = function() {	// 시간이 지나면 몬스터 생성
 	var self = this;
 	this.spawnDeltaTime = performance.now() - this.spawnTime;
 	var randomX = 450 + Math.floor(Math.random()*50);
 	var randomY = Math.floor(Math.random()*500);
-	var randomName = Math.random()>0.8? "Slime":"Snail";
+	var randomName = Math.random()>0.7? self.monster2:self.monster1;
 	if(this.spawnDelay<this.spawnDeltaTime){
 		this.spawnTime = performance.now();
 		this.monster.push(new Monster(randomX,randomY,randomName));
 	}
 }
 
-Stitch.prototype.checkCollision = function() {	// 몬스터와 스티치 충돌 이벤트
+CanvasManager.prototype.checkCollision = function() {	// 몬스터와 캐릭터 충돌 확인
 	var self = this;
+	var target = self.character
 	var n = 0;
-	self.monster.forEach(function (instance) {
-		var condition1 = self.x+self.width>instance.x && self.x<instance.x && self.y+self.height>instance.y && self.y<instance.y;
-		var condition2 = self.x<instance.x+instance.width && self.x+self.width>instance.x+instance.width && self.y+self.height>instance.y && self.y< instance.y;
-		var condition3 = self.x+self.width>instance.x && self.x < instance.x && self.y < instance.y + instance.height && self.y+self.height > instance.y+instance.height;
-		var condition4 = self.x<instance.x+instance.width && self.x+self.width > instance.x + instance.width && self.y < instance.y + instance.height && self.y + self.height > instance.y + instance.height;
-		if(condition1 || condition2 || condition3 || condition4){
+	self.monster.forEach(function (obstacle) {
+		var condition1 = target.x+target.width>obstacle.x && target.x<obstacle.x && target.y+target.height>obstacle.y && target.y<obstacle.y;
+		var condition2 = target.x<obstacle.x+obstacle.width && target.x+target.width>obstacle.x+obstacle.width && target.y+target.height>obstacle.y && target.y< obstacle.y;
+		var condition3 = target.x+target.width>obstacle.x && target.x < obstacle.x && target.y < obstacle.y + obstacle.height && target.y+target.height > obstacle.y+obstacle.height;
+		var condition4 = target.x<obstacle.x+obstacle.width && target.x+target.width > obstacle.x + obstacle.width && target.y < obstacle.y + obstacle.height && target.y + target.height > obstacle.y + obstacle.height;
+		if(condition1 || condition2 || condition3 || condition4){	// 충돌시
 			input.quit = true;
 		}
-		instance.checkCollision(self.arrow);
-		self.monsterHpCheck(n);
+		obstacle.checkCollision(self.arrow);	// 몬스터와 화살 충돌 확인
+		self.monsterHpCheck(n);	// 몬스터 사망 확인
 		n++;
 	});
 }
 
-Stitch.prototype.monsterHpCheck = function(n) {	// 죽었다면 제거
+CanvasManager.prototype.monsterHpCheck = function(n) {	// 몬스터 사망 확인
 	var self = this;
 	if(self.monster[n].hp<=0){
 		self.score += self.monster[n].maxHp;
@@ -254,7 +227,7 @@ Stitch.prototype.monsterHpCheck = function(n) {	// 죽었다면 제거
 	} 
 }
 
-Stitch.prototype.drawScore = function() {	// 점수 출력
+CanvasManager.prototype.drawScore = function() {	// 점수 출력
 	var self = this;
 	this.canvasCtx.font = "16px Arial";
 	this.canvasCtx.fillStyle = "#0095DD";
@@ -262,19 +235,19 @@ Stitch.prototype.drawScore = function() {	// 점수 출력
 
 }
 
-Stitch.prototype.quit = function() {	// quit 눌렷을시
+CanvasManager.prototype.quit = function() {	// quit 눌렷을시
 	var self = this;
 	inputReset();
 	window.clearInterval(updateInterval); 	// 인터벌 제거
 	self.removeKeyDownEvent();
+	self.addClickEvent();	// 마우스 클릭으로 대체
 	self.gold += self.score;
 	self.score = 0;
 	self.showMenu();
 }
 
-Stitch.prototype.showMenu = function() {	// 메뉴 출력
+CanvasManager.prototype.showMenu = function() {	// 메뉴 출력
 	var self = this;
-	this.addClickEvent();
 	this.canvasCtx.fillStyle = "rgba(255,255,255,1)";
 	this.canvasCtx.fillRect(0,0,500,500);
 	this.canvasCtx.font = "30px Arial";
@@ -285,31 +258,77 @@ Stitch.prototype.showMenu = function() {	// 메뉴 출력
 	this.canvasCtx.fillStyle = "#998800";
 	this.canvasCtx.fillText("재시작",20,140);
 	this.canvasCtx.fillStyle = "#666666";
-	this.canvasCtx.fillText("공격력: " + self.damage + " (cost: " + self.damage*100 + ")",20,190);
-	
+	this.canvasCtx.fillText("공격력: " + self.damage + " (cost: " + self.damage*10 + ")",20,190);
+	this.canvasCtx.fillStyle = "#fe12e3";
+	this.canvasCtx.fillText("공속: " + self.arrowDelay + " (cost: " + Math.floor(100000/self.arrowDelay) + ")",20,240);
+	this.canvasCtx.fillStyle = "#12fee3";
+	this.canvasCtx.fillText("난이도: " + self.difficulty ,20,290);
+	this.canvasCtx.fillText("▲ ▼",300,290);
 }
 
-Stitch.prototype.update = function() {	//	업데이트
+CanvasManager.prototype.reStart = function(){	// 재시작
 	var self = this;
-	self.checkArrow();
-	self.checkMonster();
-	self.checkCollision();
-	
-	self.draw();
-	self.monster.forEach(function (instance){
-		instance.draw();
-	});
-	self.arrow.forEach(function (instance){
-		instance.draw();
-	});
-	self.drawScore();
-	if(input.quit) {
-		self.quit();
+	self.score = 0;
+	self.character.x = 20;
+	self.character.y = 20;
+	self.monster = [];
+	self.arrow = [];
+	self.monster1 = "Snail";
+	self.monster2 = "Slime";
+	self.spawnDelay = 1000 - (self.difficulty%10)*50;
+	if(self.difficulty>=10){
+		self.monster1 = "Resh";
+		self.monster2 = "Harf";
+		self.spawnDelay = 1000 - ((self.difficulty-10)%10)*50;
 	}
+	if(self.difficulty>=20){
+		self.monster1 = "Threetale";
+		self.monster2 = "DualBurk";
+		self.spawnDelay = 1000 - ((self.difficulty-20)%10)*50;
+	}
+	if(self.difficulty>=30){
+		self.monster1 = "Ghost";
+		self.monster2 = "Dragon";
+		self.spawnDelay = 1000 - ((self.difficulty-30)%10)*50;
+	}
+	
+	updateInterval = window.setInterval("manager.update()",1000/60);
+	self.removeClickEvent();
+	self.addKeyEvent();
 }
 
 
-// arrow.js
+
+
+// Character.js
+function Character(x,y) {	// 캐릭터
+	this.canvas = document.querySelector('.my-canvas');
+	this.canvasCtx = this.canvas.getContext('2d');
+	this.x = x;
+	this.y = y;
+	this.width = 80;
+	this.height = 96;
+}
+
+Character.prototype.draw = function() {	// 객체 그리기
+	var self = this;
+	if(input.up&&this.y>=14) this.y-=6;
+	if(input.down&&this.y<=386) this.y+=6;
+	if(input.right&&this.x<=386) this.x+=6;
+	if(input.left&&this.x>=14) this.x-=6;
+	var img = new Image();
+	img.src = 'images/Stitch.jpg';
+	self.canvasCtx.drawImage(img,self.x,self.y,self.width,self.height);
+}
+
+
+
+
+
+
+
+
+// Arrow.js
 
 function Arrow(x,y,vx,vy,g,damage) {	// 화살
 	this.canvas = document.querySelector('.my-canvas');
@@ -334,7 +353,7 @@ Arrow.prototype.draw = function() {	// 화살 그리기
 	self.canvasCtx.drawImage(img,self.x,self.y,self.width,self.height);
 }
 
-// monster.js
+// Monster.js
 
 function Monster(x,y,name) {	// 몬스터
 	this.canvas = document.querySelector('.my-canvas');
@@ -365,7 +384,7 @@ Monster.prototype.init = function() {	// 초기화
 			this.width = 65;
 			this.height = 56;
 			this.maxHp = 200;
-			this.vx = -2;
+			this.vx = -1.5;
 			break;
 		case "Harf" :
 			this.width = 73;
@@ -383,13 +402,19 @@ Monster.prototype.init = function() {	// 초기화
 			this.width = 93;
 			this.height = 70;
 			this.maxHp = 600;
-			this.vx = -2;
+			this.vx = -1.5;
 			break;
 		case "Ghost" :
-			this.width = 42;
-			this.height = 33;
-			this.maxHp = 700;
-			this.vx = -2;
+			this.width = 67;
+			this.height = 92;
+			this.maxHp = 1000;
+			this.vx = -1.2;
+			break;
+		case "Dragon" :
+			this.width = 77;
+			this.height = 54;
+			this.maxHp = 1200;
+			this.vx = -1.5;
 			break;
 		default :
 			this.width = 67;
@@ -427,12 +452,11 @@ Monster.prototype.draw = function() {	// 몬스터 그리기
 }
 
 
-// application.js
-var stitch;
+// Application.js
+var manager;
 document.addEventListener("DOMContentLoaded",function() {	// 로드시 이벤트
-	var canvas = document.querySelector('.my-canvas');
-	var manager = new CanvasManager(canvas);
-	stitch = new Stitch(canvas,10,10);
-	updateInterval = window.setInterval("stitch.update()",1000/60);	// 0.03초마다 스티치 드로우
+
+	manager = new CanvasManager();	// 캔버스 매니저 선언
+
 		
 });
