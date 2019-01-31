@@ -99,6 +99,31 @@ function clickEvent(e) {	// 클릭 이벤트
 }
 
 var updateInterval;	// 인터벌
+var Img = {
+	Stitch : new Image(),
+	Star : new Image(),
+	Snail : new Image(),
+	Slime : new Image(),
+	Resh : new Image(),
+	Harf : new Image(),
+	Threetale : new Image(),
+	DualBurk : new Image(),
+	Ghost : new Image(),
+	Dragon : new Image()
+};
+function initiateImage() {
+	Img.Stitch.src="images/Stitch.jpg";
+	Img.Star.src="Images/Star.png";
+	Img.Snail.src="images/Snail.png";
+	Img.Slime.src="images/Slime.png";
+	Img.Resh.src="images/Resh.png";
+	Img.Harf.src="images/Harf.png";
+	Img.Threetale.src="images/Threetale.png";
+	Img.DualBurk.src="images/DualBurk.png";
+	Img.Ghost.src="images/Ghost.png";
+	Img.Dragon.src="images/Dragon.png";
+}
+
 
 // Canvas.js
 function CanvasManager() {
@@ -308,6 +333,7 @@ function Character(x,y) {	// 캐릭터
 	this.y = y;
 	this.width = 80;
 	this.height = 96;
+	this.img = Img.Stitch;
 }
 
 Character.prototype.draw = function() {	// 객체 그리기
@@ -316,9 +342,7 @@ Character.prototype.draw = function() {	// 객체 그리기
 	if(input.down&&this.y<=386) this.y+=6;
 	if(input.right&&this.x<=386) this.x+=6;
 	if(input.left&&this.x>=14) this.x-=6;
-	var img = new Image();
-	img.src = 'images/Stitch.jpg';
-	self.canvasCtx.drawImage(img,self.x,self.y,self.width,self.height);
+	self.canvasCtx.drawImage(self.img,self.x,self.y,self.width,self.height);
 }
 
 
@@ -341,6 +365,7 @@ function Arrow(x,y,vx,vy,g,damage) {	// 화살
 	this.g = g;
 	this.width = 20;
 	this.height = 20;
+	this.img = Img.Star;
 }
 
 Arrow.prototype.draw = function() {	// 화살 그리기
@@ -348,9 +373,7 @@ Arrow.prototype.draw = function() {	// 화살 그리기
 	self.vy += self.g;
 	self.x += self.vx;
 	self.y += self.vy;
-	var img = new Image();
-	img.src = 'images/Star.png';
-	self.canvasCtx.drawImage(img,self.x,self.y,self.width,self.height);
+	self.canvasCtx.drawImage(self.img,self.x,self.y,self.width,self.height);
 }
 
 // Monster.js
@@ -362,7 +385,6 @@ function Monster(x,y,name) {	// 몬스터
 	this.y = y;
 	this.vx = -1.5;
 	this.name = name;
-
 	this.init();
 }
 
@@ -373,29 +395,34 @@ Monster.prototype.init = function() {	// 초기화
 			this.height = 47;
 			this.maxHp = 100;
 			this.vx = -1.5;
+			this.img = Img.Slime;
 			break;
 		case "Snail" :
 			this.width = 42;
 			this.height = 33;
 			this.maxHp = 30;
 			this.vx = -2;
+			this.img = Img.Snail;
 			break;
 		case "Resh" :
 			this.width = 65;
 			this.height = 56;
 			this.maxHp = 200;
 			this.vx = -1.5;
+			this.img = Img.Resh;
 			break;
 		case "Harf" :
 			this.width = 73;
 			this.height = 96;
 			this.maxHp = 300;
 			this.vx = -2;
+			this.img = Img.Harf;
 			break;
 		case "Threetale" :
 			this.width = 95;
 			this.height = 75;
 			this.maxHp = 500;
+			this.img = Img.Threetale;
 			this.vx = -2;
 			break;
 		case "DualBurk" :
@@ -403,25 +430,29 @@ Monster.prototype.init = function() {	// 초기화
 			this.height = 70;
 			this.maxHp = 600;
 			this.vx = -1.5;
+			this.img = Img.DualBurk;
 			break;
 		case "Ghost" :
 			this.width = 67;
 			this.height = 92;
 			this.maxHp = 1000;
 			this.vx = -1.2;
+			this.img = Img.Ghost;
 			break;
 		case "Dragon" :
 			this.width = 77;
 			this.height = 54;
 			this.maxHp = 1200;
 			this.vx = -1.5;
+			this.img = Img.Dragon;
 			break;
 		default :
 			this.width = 67;
 			this.height = 92;
 			this.maxHp = 30;
 			this.vs = -2;
-			this.name = "snail";
+			this.name = "Snail";
+			this.img = Img.Snail;
 	}
 	this.hp = this.maxHp;
 }
@@ -446,17 +477,15 @@ Monster.prototype.checkCollision = function(arrow) {	// 몬스터와 화살 충�
 Monster.prototype.draw = function() {	// 몬스터 그리기
 	var self = this;
 	self.x += self.vx 
-	var img = new Image();
-	img.src = 'images/'+self.name+'.png';
-	self.canvasCtx.drawImage(img,self.x,self.y,self.width,self.height);
+	self.canvasCtx.drawImage(self.img,self.x,self.y,self.width,self.height);
 }
 
 
 // Application.js
 var manager;
 document.addEventListener("DOMContentLoaded",function() {	// 로드시 이벤트
-
+	initiateImage();
 	manager = new CanvasManager();	// 캔버스 매니저 선언
-
+	
 		
 });
