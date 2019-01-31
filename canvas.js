@@ -99,29 +99,66 @@ function clickEvent(e) {	// 클릭 이벤트
 }
 
 var updateInterval;	// 인터벌
-var Img = {
-	Stitch : new Image(),
-	Star : new Image(),
-	Snail : new Image(),
-	Slime : new Image(),
-	Resh : new Image(),
-	Harf : new Image(),
-	Threetale : new Image(),
-	DualBurk : new Image(),
-	Ghost : new Image(),
-	Dragon : new Image()
+
+// Img.js
+function Img() {
+	this.Stitch = new Image();
+	this.Star = new Image();
+	this.Snail = new Image();
+	this.Slime = new Image();
+	this.Resh = new Image();
+	this.Harf = new Image();
+	this.Threetale = new Image();
+	this.DualBurk = new Image();
+	this.Ghost = new Image();
+	this.Dragon = new Image();
+	this.length = 0;
+	this.init();
+	this.addEvent();
 };
-function initiateImage() {
-	Img.Stitch.src="https://github.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/blob/master/images/Stitch.JPG?raw=true";
-	Img.Star.src="https://github.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/blob/master/images/Star.PNG?raw=true";
-	Img.Snail.src="https://github.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/blob/master/images/Snail.PNG?raw=true";
-	Img.Slime.src="https://github.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/blob/master/images/Slime.PNG?raw=true";
-	Img.Resh.src="https://github.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/blob/master/images/Resh.PNG?raw=true";
-	Img.Harf.src="https://github.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/blob/master/images/Harf.PNG?raw=true";
-	Img.Threetale.src="https://github.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/blob/master/images/Threetale.PNG?raw=true";
-	Img.DualBurk.src="https://github.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/blob/master/images/DualBurk.PNG?raw=true";
-	Img.Ghost.src="https://github.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/blob/master/images/Ghost.PNG?raw=true";
-	Img.Dragon.src="https://github.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/blob/master/images/Dragon.PNG?raw=true";
+
+Img.prototype.init = function() {
+	this.Stitch.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Stitch.jpg";
+	this.length++;
+	this.Star.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Star.png";
+	this.length++;
+	this.Snail.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Snail.png";
+	this.length++;
+	this.Slime.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Slime.png";
+	this.length++;
+	this.Resh.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Resh.PNG";
+	this.length++;
+	this.Harf.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Harf.PNG";
+	this.length++;
+	this.Threetale.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Threetale.PNG";
+	this.length++;
+	this.DualBurk.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/DualBurk.PNG";
+	this.length++;
+	this.Ghost.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Ghost.PNG";
+	this.length++;
+	this.Dragon.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Dragon.PNG";
+	this.length++;
+}
+
+Img.prototype.addEvent = function() {
+	this. Stitch.addEventListener("load",imgOnLoad,false);
+	this.Star.addEventListener("load",imgOnLoad,false);
+	this.Snail.addEventListener("load",imgOnLoad,false);
+	this.Slime.addEventListener("load",imgOnLoad,false);
+	this.Resh.addEventListener("load",imgOnLoad,false);
+	this.Harf.addEventListener("load",imgOnLoad,false);
+	this.Threetale.addEventListener("load",imgOnLoad,false);
+	this.DualBurk.addEventListener("load",imgOnLoad,false);
+	this.Ghost.addEventListener("load",imgOnLoad,false);
+	this.Dragon.addEventListener("load",imgOnLoad,false);
+
+}
+
+function imgOnLoad() {
+	imglength ++;
+	if(imglength>=images.length){
+		manager = new CanvasManager();	// 캔버스 매니저 선언
+	}
 }
 
 
@@ -333,7 +370,7 @@ function Character(x,y) {	// 캐릭터
 	this.y = y;
 	this.width = 80;
 	this.height = 96;
-	this.img = Img.Stitch;
+	this.img = images.Stitch;
 }
 
 Character.prototype.draw = function() {	// 객체 그리기
@@ -365,7 +402,7 @@ function Arrow(x,y,vx,vy,g,damage) {	// 화살
 	this.g = g;
 	this.width = 20;
 	this.height = 20;
-	this.img = Img.Star;
+	this.img = images.Star;
 }
 
 Arrow.prototype.draw = function() {	// 화살 그리기
@@ -395,34 +432,34 @@ Monster.prototype.init = function() {	// 초기화
 			this.height = 47;
 			this.maxHp = 100;
 			this.vx = -1.5;
-			this.img = Img.Slime;
+			this.img = images.Slime;
 			break;
 		case "Snail" :
 			this.width = 42;
 			this.height = 33;
 			this.maxHp = 30;
 			this.vx = -2;
-			this.img = Img.Snail;
+			this.img = images.Snail;
 			break;
 		case "Resh" :
 			this.width = 65;
 			this.height = 56;
 			this.maxHp = 200;
 			this.vx = -1.5;
-			this.img = Img.Resh;
+			this.img = images.Resh;
 			break;
 		case "Harf" :
 			this.width = 73;
 			this.height = 96;
 			this.maxHp = 300;
 			this.vx = -2;
-			this.img = Img.Harf;
+			this.img = images.Harf;
 			break;
 		case "Threetale" :
 			this.width = 95;
 			this.height = 75;
 			this.maxHp = 500;
-			this.img = Img.Threetale;
+			this.img = images.Threetale;
 			this.vx = -2;
 			break;
 		case "DualBurk" :
@@ -430,21 +467,21 @@ Monster.prototype.init = function() {	// 초기화
 			this.height = 70;
 			this.maxHp = 600;
 			this.vx = -1.5;
-			this.img = Img.DualBurk;
+			this.img = images.DualBurk;
 			break;
 		case "Ghost" :
 			this.width = 67;
 			this.height = 92;
 			this.maxHp = 1000;
 			this.vx = -1.2;
-			this.img = Img.Ghost;
+			this.img = images.Ghost;
 			break;
 		case "Dragon" :
 			this.width = 77;
 			this.height = 54;
 			this.maxHp = 1200;
 			this.vx = -1.5;
-			this.img = Img.Dragon;
+			this.img = images.Dragon;
 			break;
 		default :
 			this.width = 67;
@@ -452,7 +489,7 @@ Monster.prototype.init = function() {	// 초기화
 			this.maxHp = 30;
 			this.vs = -2;
 			this.name = "Snail";
-			this.img = Img.Snail;
+			this.img = Images.Snail;
 	}
 	this.hp = this.maxHp;
 }
@@ -483,9 +520,9 @@ Monster.prototype.draw = function() {	// 몬스터 그리기
 
 // Application.js
 var manager;
+var imglength=0;
+var images;
 document.addEventListener("DOMContentLoaded",function() {	// 로드시 이벤트
-	initiateImage();
-	manager = new CanvasManager();	// 캔버스 매니저 선언
-	
-		
+	images = new Img();
 });
+
