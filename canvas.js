@@ -112,16 +112,16 @@ var Img = {
 	Dragon : new Image()
 };
 function initiateImage() {
-	Img.Stitch.src="images/Stitch.jpg";
-	Img.Star.src="Images/Star.png";
-	Img.Snail.src="images/Snail.png";
-	Img.Slime.src="images/Slime.png";
-	Img.Resh.src="images/Resh.png";
-	Img.Harf.src="images/Harf.png";
-	Img.Threetale.src="images/Threetale.png";
-	Img.DualBurk.src="images/DualBurk.png";
-	Img.Ghost.src="images/Ghost.png";
-	Img.Dragon.src="images/Dragon.png";
+	Img.Stitch.src="https://github.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/blob/master/images/Stitch.JPG?raw=true";
+	Img.Star.src="https://github.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/blob/master/images/Star.PNG?raw=true";
+	Img.Snail.src="https://github.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/blob/master/images/Snail.PNG?raw=true";
+	Img.Slime.src="https://github.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/blob/master/images/Slime.PNG?raw=true";
+	Img.Resh.src="https://github.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/blob/master/images/Resh.PNG?raw=true";
+	Img.Harf.src="https://github.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/blob/master/images/Harf.PNG?raw=true";
+	Img.Threetale.src="https://github.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/blob/master/images/Threetale.PNG?raw=true";
+	Img.DualBurk.src="https://github.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/blob/master/images/DualBurk.PNG?raw=true";
+	Img.Ghost.src="https://github.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/blob/master/images/Ghost.PNG?raw=true";
+	Img.Dragon.src="https://github.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/blob/master/images/Dragon.PNG?raw=true";
 }
 
 
