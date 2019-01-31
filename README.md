@@ -1,7 +1,7 @@
 ﻿# JavaScript_Canvas_Practice
 
 ### 현재 내 캔버스
-[<img src = "https://github.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/blob/master/images/canvas1.PNG?raw=true" height="600" title="Canvas">]
+[<img src = "https://github.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/blob/master/images/canvas1.PNG?raw=true" height="600" title="Canvas">](https://seohyeonmyeong.github.io/JavaScript_Canvas_Practice/canvas.html)
 
 ***
 &nbsp;
