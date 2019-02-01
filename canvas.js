@@ -74,9 +74,10 @@ function clickEvent(e) {	// 클릭 이벤트
 		}
 	}
 	if(x>71&&x<359&&y>353&&y<381){	// 속도 증가
-		if(Math.floor(100000/manager.arrowDelay)<=manager.gold){
-			manager.gold -= Math.floor(100000/manager.arrowDelay);
-			manager.arrowDelay -= 40;
+		if(manager.agility*5<=manager.gold){
+			manager.gold -= manager.agility*5;
+			manager.agility += 5;
+			manager.arrowDelay = 60000 / manager.agility;
 			manager.showMenu();
 			
 		}
@@ -101,7 +102,7 @@ function clickEvent(e) {	// 클릭 이벤트
 var updateInterval;	// 인터벌
 
 // Img.js
-function Img() {
+function Img() {	// 이미지
 	this.Stitch = new Image();
 	this.Star = new Image();
 	this.Snail = new Image();
@@ -117,7 +118,7 @@ function Img() {
 	this.addEvent();
 };
 
-Img.prototype.init = function() {
+Img.prototype.init = function() {	// 이미지 로드
 	this.Stitch.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Stitch.jpg";
 	this.length++;
 	this.Star.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Star.png";
@@ -140,7 +141,7 @@ Img.prototype.init = function() {
 	this.length++;
 }
 
-Img.prototype.addEvent = function() {
+Img.prototype.addEvent = function() {	// 로드 이벤트 추가
 	this. Stitch.addEventListener("load",imgOnLoad,false);
 	this.Star.addEventListener("load",imgOnLoad,false);
 	this.Snail.addEventListener("load",imgOnLoad,false);
@@ -154,7 +155,7 @@ Img.prototype.addEvent = function() {
 
 }
 
-function imgOnLoad() {
+function imgOnLoad() {	// 로드 이벤트 , 로드 완료시 매니저 실행
 	imglength ++;
 	if(imglength>=images.length){
 		manager = new CanvasManager();	// 캔버스 매니저 선언
@@ -170,7 +171,8 @@ function CanvasManager() {
 	this.score = 0;	// 스코어 0
 	this.gold = 0;	// 골드 0
 	this.damage = 40;	// 데미지 40
-	this.arrowDelay = 1000;	// 화살 딜레이
+	this.agility = 60;	// 공격속도
+	this.arrowDelay = 60000 / this.agility;	// 화살 딜레이
 	this.arrowDeltaTime = 0;	// 화살 델타타임
 	this.arrowTime = performance.now(); // 화살 시간
 	this.monster1 = "Snail";
@@ -322,7 +324,7 @@ CanvasManager.prototype.showMenu = function() {	// 메뉴 출력
 	this.canvasCtx.fillStyle = "#666666";
 	this.canvasCtx.fillText("공격력: " + self.damage + " (cost: " + self.damage*10 + ")",20,190);
 	this.canvasCtx.fillStyle = "#fe12e3";
-	this.canvasCtx.fillText("공속: " + self.arrowDelay + " (cost: " + Math.floor(100000/self.arrowDelay) + ")",20,240);
+	this.canvasCtx.fillText("공속: " + self.agility + " (cost: " + self.agility*5 + ")",20,240);
 	this.canvasCtx.fillStyle = "#12fee3";
 	this.canvasCtx.fillText("난이도: " + self.difficulty ,20,290);
 	this.canvasCtx.fillText("▲ ▼",300,290);
