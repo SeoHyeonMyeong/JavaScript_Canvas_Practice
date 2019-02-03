@@ -4,14 +4,14 @@
 }
 
 .contents-container {
-	width : 540px;
+	width : 1040px;
 	padding : 10px;
 	margin : 0px;
 	background-color : #ecd9ec;
 }
 
 .canvas-container {
-	width : 540px;
+	width : 1040px;
 	height : auto;
 	background-color : #8ee;
 }
@@ -22,7 +22,7 @@
 }
 
 h1 {
-	width : 540px;
+	width : 1040px;
 	color : #545454;
 	text-align : center;
 }
