@@ -103,7 +103,7 @@ function clickEvent(e) {	// 클릭 이벤트
 		}
 	}
 	if(x>552&&x<881&&y>302&&y<332){	// 멀티화살 증가
-		if(manager.arrowMulti<5&&manager.arrowMulti*10000<=manager.gold){
+		if(manager.arrowMulti<4&&manager.arrowMulti*10000<=manager.gold){
 			manager.gold -= manager.arrowMulti*10000;
 			manager.arrowMulti++;
 			manager.showMenu();
