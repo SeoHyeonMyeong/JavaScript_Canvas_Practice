@@ -122,6 +122,14 @@ function clickEvent(e) {	// 클릭 이벤트
 			
 		}
 	}
+	if(x>552&&x<881&&y>353&&y<381){	// 크리티컬 확률 증가
+		if(manager.critical<0.5&&manager.critical*10000<=manager.gold){
+			manager.gold -= manager.critical*10000;
+			manager.critical+=0.05;
+			manager.showMenu();
+			
+		}
+	}
 	
 }
 
@@ -202,6 +210,8 @@ function CanvasManager() {
 	this.gold = 0;	// 골드 0
 	this.attackDamage = 40;	// 데미지 40
 	this.agility = 60;	// 공격속도
+	this.critical = 0.1;	// 크리율
+	this.criticalDamage = 2;	// 크리 배율
 	this.arrowDelay = 60000 / this.agility;	// 화살 딜레이
 	this.arrowDeltaTime = 0;	// 화살 델타타임
 	this.arrowTime = performance.now(); // 화살 시간
@@ -280,6 +290,12 @@ CanvasManager.prototype.checkArrow = function() {	// 시간이 지났다면 화�
 	var randomY = self.character.y+self.character.height/2-10;
 	var vy = 0;
 	var g = 0;
+	var attackDamage = self.attackDamage
+	var isCritical = false;
+	if(Math.random()<self.critical){
+		attackDamage *= self.criticalDamage;
+		isCritical = true;
+	}
 	if(Math.random()>0){
 		vy = -6;
 		g = 0.2;
@@ -289,30 +305,30 @@ CanvasManager.prototype.checkArrow = function() {	// 시간이 지났다면 화�
 		this.arrowTime = performance.now();
 		switch(self.arrowMulti){
 			case 1 :
-				this.arrow.push(new Arrow(randomX,randomY,vx,vy,g,self.attackDamage));
+				this.arrow.push(new Arrow(randomX,randomY,vx,vy,g,attackDamage,isCritical));
 				break;
 			case 2 :
 				vy = -5.75;
-				this.arrow.push(new Arrow(randomX,randomY,vx,vy,g,self.attackDamage));
+				this.arrow.push(new Arrow(randomX,randomY,vx,vy,g,attackDamage,isCritical));
 				vy = -6.25;
-				this.arrow.push(new Arrow(randomX,randomY,vx,vy,g,self.attackDamage));
+				this.arrow.push(new Arrow(randomX,randomY,vx,vy,g,attackDamage,isCritical));
 				break;
 			case 3 :
-				this.arrow.push(new Arrow(randomX,randomY,vx,vy,g,self.attackDamage));
+				this.arrow.push(new Arrow(randomX,randomY,vx,vy,g,attackDamage,isCritical));
 				vy = -5.5;
-				this.arrow.push(new Arrow(randomX,randomY,vx,vy,g,self.attackDamage));
+				this.arrow.push(new Arrow(randomX,randomY,vx,vy,g,attackDamage,isCritical));
 				vy = -6.5;
-				this.arrow.push(new Arrow(randomX,randomY,vx,vy,g,self.attackDamage));
+				this.arrow.push(new Arrow(randomX,randomY,vx,vy,g,attackDamage,isCritical));
 				break;
 			case 4 :
 				vy = -5.75;
-				this.arrow.push(new Arrow(randomX,randomY,vx,vy,g,self.attackDamage));
+				this.arrow.push(new Arrow(randomX,randomY,vx,vy,g,attackDamage,isCritical));
 				vy = -6.25;
-				this.arrow.push(new Arrow(randomX,randomY,vx,vy,g,self.attackDamage));
+				this.arrow.push(new Arrow(randomX,randomY,vx,vy,g,attackDamage,isCritical));
 				vy = -5.25;
-				this.arrow.push(new Arrow(randomX,randomY,vx,vy,g,self.attackDamage));
+				this.arrow.push(new Arrow(randomX,randomY,vx,vy,g,attackDamage,isCritical));
 				vy = -6.75;
-				this.arrow.push(new Arrow(randomX,randomY,vx,vy,g,self.attackDamage));
+				this.arrow.push(new Arrow(randomX,randomY,vx,vy,g,attackDamage,isCritical));
 				break;
 			default :
 				break;
@@ -403,8 +419,11 @@ CanvasManager.prototype.showMenu = function() {	// 메뉴 출력
 	this.canvasCtx.fillStyle = "#12fee3";
 	this.canvasCtx.fillText("난이도: " + self.difficulty ,20,290);
 	this.canvasCtx.fillText("▲ ▼",300,290);
-	this.canvasCtx.fillStyle = "#fee312";
+	this.canvasCtx.fillStyle = "#bea312";
 	this.canvasCtx.fillText("멀티화살: " + self.arrowMulti + " (cost: " + self.arrowMulti*10000 + ")",500,190);
+	this.canvasCtx.fillStyle = "#5555ee";
+	this.canvasCtx.fillText("크리티컬확률: " + self.critical*100 + "% (cost: " + self.critical*100*100 + ")",500,240);
+
 }
 
 CanvasManager.prototype.reStart = function(){	// 재시작
@@ -471,7 +490,7 @@ Character.prototype.draw = function() {	// 객체 그리기
 
 // Arrow.js
 
-function Arrow(x,y,vx,vy,g,attackDamage) {	// 화살
+function Arrow(x,y,vx,vy,g,attackDamage,isCritical) {	// 화살
 	this.canvas = document.querySelector('.my-canvas');
 	this.canvasCtx = this.canvas.getContext('2d');
 	this.x = x;
@@ -479,6 +498,7 @@ function Arrow(x,y,vx,vy,g,attackDamage) {	// 화살
 	this.vx = vx;
 	this.vy = vy;
 	this.attackDamage = attackDamage;
+	this.isCritical = isCritical;
 	this.g = g;
 	this.width = 82;
 	this.height = 11;
@@ -590,7 +610,7 @@ Monster.prototype.checkCollision = function() {	// 몬스터와 화살 충돌 �
 		var condition4 = self.x<instance.x+instance.width && self.x+self.width > instance.x + instance.width && self.y < instance.y + instance.height && self.y + self.height > instance.y + instance.height;
 		if(condition1 || condition2 || condition3 || condition4){
 			self.hp-= instance.attackDamage;
-			manager.damage.push(new Damage(self.x+self.width/2,self.y,instance.attackDamage));
+			manager.damage.push(new Damage(self.x+self.width/2,self.y,instance.attackDamage,instance.isCritical));
 			manager.arrow.splice(n,1);
 
 		}
@@ -606,19 +626,24 @@ Monster.prototype.draw = function() {	// 몬스터 그리기
 }
 
 // Damage.js
-function Damage(x,y,value) {
+function Damage(x,y,value,isCritical) {
 	this.canvas = document.querySelector('.my-canvas');
 	this.canvasCtx = this.canvas.getContext('2d');
 	this.x = x;
 	this.y = y;
 	this.time = performance.now();
 	this.value = value;
+	this.isCritical = isCritical;
 }
 
 Damage.prototype.draw = function() {
 	var self = this;
 	this.canvasCtx.font = "16px Arial";
 	this.canvasCtx.fillStyle = "#0095DD";
+	if(self.isCritical) {
+		this.canvasCtx.font = "20px Arial";
+		this.canvasCtx.fillStyle = "#ee00DD";
+	}
 	this.canvasCtx.fillText(self.value,self.x,self.y);
 }
 
