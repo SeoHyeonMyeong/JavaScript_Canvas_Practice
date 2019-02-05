@@ -127,6 +127,7 @@ function Img() {	// 이미지
 	this.DualBurk = new Image();
 	this.Ghost = new Image();
 	this.Dragon = new Image();
+	this.Arrow = new Image();
 	this.length = 0;
 	this.init();
 	this.addEvent();
@@ -153,6 +154,8 @@ Img.prototype.init = function() {	// 이미지 로드
 	this.length++;
 	this.Dragon.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Dragon.PNG";
 	this.length++;
+	this.Arrow.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Arrow.png";
+	this.length++;
 }
 
 Img.prototype.addEvent = function() {	// 로드 이벤트 추가
@@ -166,6 +169,7 @@ Img.prototype.addEvent = function() {	// 로드 이벤트 추가
 	this.DualBurk.addEventListener("load",imgOnLoad,false);
 	this.Ghost.addEventListener("load",imgOnLoad,false);
 	this.Dragon.addEventListener("load",imgOnLoad,false);
+	this.Arrow.addEventListener("load",imgOnLoad,false);
 
 }
 
@@ -474,7 +478,13 @@ Arrow.prototype.draw = function() {	// 화살 그리기
 	self.vy += self.g;
 	self.x += self.vx;
 	self.y += self.vy;
-	self.canvasCtx.drawImage(self.img,self.x,self.y,self.width,self.height);
+	var angle = Math.atan(vy/vx);
+	Context.save();
+	Context.translate(self.x+self.width/2,self.y+self.height/2);			//이미지의 생성점과 회전 기준점을 설정
+	Context.rotate(angle);	//기준점을 기준으로 회전
+	Context.translate(-self.x-self.width/2,-self.y-self.height/2);			//원점으로 생성점과 기준점을 바꾼다.
+	self.canvasCtx.drawImage(self.img,self.x,self.y);		//기준점이 0,0이기 때문에 0,0으로 생성됨
+	Context.restore();				//컨텍스트 반환
 }
 
 // Monster.js
