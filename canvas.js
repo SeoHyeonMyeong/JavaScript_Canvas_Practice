@@ -468,9 +468,9 @@ function Arrow(x,y,vx,vy,g,attackDamage) {	// 화살
 	this.vy = vy;
 	this.attackDamage = attackDamage;
 	this.g = g;
-	this.width = 20;
-	this.height = 20;
-	this.img = images.Star;
+	this.width = 82;
+	this.height = 11;
+	this.img = images.Arrow;
 }
 
 Arrow.prototype.draw = function() {	// 화살 그리기
@@ -478,13 +478,13 @@ Arrow.prototype.draw = function() {	// 화살 그리기
 	self.vy += self.g;
 	self.x += self.vx;
 	self.y += self.vy;
-	var angle = Math.atan(vy/vx);
-	Context.save();
-	Context.translate(self.x+self.width/2,self.y+self.height/2);			//이미지의 생성점과 회전 기준점을 설정
-	Context.rotate(angle);	//기준점을 기준으로 회전
-	Context.translate(-self.x-self.width/2,-self.y-self.height/2);			//원점으로 생성점과 기준점을 바꾼다.
-	self.canvasCtx.drawImage(self.img,self.x,self.y);		//기준점이 0,0이기 때문에 0,0으로 생성됨
-	Context.restore();				//컨텍스트 반환
+	var angle = Math.atan(self.vy/self.vx);
+	self.canvasCtx.save();
+	self.canvasCtx.translate(self.x+self.width/2,self.y+self.height/2);			//이미지의 생성점과 회전 기준점을 설정
+	self.canvasCtx.rotate(angle);	//기준점을 기준으로 회전
+	self.canvasCtx.translate(-self.x-self.width/2,-self.y-self.height/2);			//원점으로 생성점과 기준점을 바꾼다.
+	self.canvasCtx.drawImage(self.img,self.x,self.y,self.width,self.height);		//기준점이 0,0이기 때문에 0,0으로 생성됨
+	self.canvasCtx.restore();				//컨텍스트 반환
 }
 
 // Monster.js
