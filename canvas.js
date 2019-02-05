@@ -61,6 +61,18 @@ function menuKeyEvent(e) {	// 메뉴창에서 스페이스바 누를시 재시�
 	if(e.key===" "){
 		manager.reStart();
 	}
+	if(e.key==="ArrowUp"){
+		if(manager.difficulty<39){
+			manager.difficulty++;
+			manager.showMenu();
+		}
+	}
+	if(e.key==="ArrowDown"){
+		if(manager.difficulty>1){
+			manager.difficulty--;
+			manager.showMenu();
+		}
+	}
 }
 
 function clickEvent(e) {	// 클릭 이벤트
