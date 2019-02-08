@@ -217,9 +217,9 @@ function CanvasManager() {
 	this.arrowDeltaTime = 0;	// 화살 델타타임
 	this.arrowTime = performance.now(); // 화살 시간
 	this.arrowMulti = 1;	// 화살 멀티
-	this.waveDelay = 5000;	// 웨이브 딜레이
+	this.waveDelay = 6000;	// 웨이브 딜레이
 	this.waveDeltaTime = 0;	// 웨이브 델타타임
-	this.waveTime = performance.now();	// 웨이브 시간
+	this.waveTime = performance.now()-3000;	// 웨이브 시간
 	this.waveStartTime = performance.now();
 	this.waveEndTime = 36000;
 	this.monster1 = "Snail";
@@ -347,52 +347,54 @@ CanvasManager.prototype.monsterWave = function() {	// 몬스터 웨이브
 	switch(Math.floor(self.difficulty/5)) {
 		case 0 :
 			wavelevel = Math.random()<1? 0:1;
+			self.waveDelay = 6000;
 			break;
 		case 1 :
 			wavelevel = Math.random()<0.7? 0:1;
+			self.waveDelay = 5800;
 			break;
 		case 2 :
 			templevel = Math.random()<0.95? 1:2;
 			wavelevel = Math.random()<0.6? 0:templevel;
-			self.waveDelay = 4800;
+			self.waveDelay = 5600;
 			break;
 		case 3 :
 			templevel = Math.random()<0.8? 1:2;
 			wavelevel = Math.random()<0.4? 0:templevel;
-			self.waveDelay = 4800;
+			self.waveDelay = 5600;
 			break;
 		case 4 :
 			templevel = Math.random()<0.5? 1:2;
 			wavelevel = Math.random()<0.2? 0:templevel;
-			self.waveDelay = 4400;
+			self.waveDelay = 5400;
 			break;
 		case 5 :
 			wavelevel = Math.random()<0.5? 1:2;
-			self.waveDelay = 4400;
+			self.waveDelay = 5400;
 			break;
 		case 6 :
 			templevel = Math.random()<0.9? 2:3;
 			wavelevel = Math.random()<0.4? 1:templevel;
-			self.waveDelay = 4000;
+			self.waveDelay = 5000;
 			break;
 		case 7 :
 			templevel = Math.random()<0.75? 2:3;
 			wavelevel = Math.random()<0.3? 1:templevel;
-			self.waveDelay = 4000;
+			self.waveDelay = 5000;
 			break;
 		case 8 :
 			templevel = Math.random()<0.5? 2:3;
 			wavelevel = Math.random()<0.2? 1:templevel;
-			self.waveDelay = 4000;
+			self.waveDelay = 4800;
 			break;
 		case 9 :
 			wavelevel = Math.random()<0.5? 2:3;
-			self.waveDelay = 4000;
+			self.waveDelay = 4800;
 			break;
 		case 10 :
 			templevel = Math.random()<0.75? 3:4;
 			wavelevel = Math.random()<0.3? 1:templevel;
-			self.waveDelay = 4000;
+			self.waveDelay = 4800;
 			break;
 		default :
 			break;
@@ -404,31 +406,31 @@ CanvasManager.prototype.monsterWave = function() {	// 몬스터 웨이브
 		switch(wavelevel){
 			case 0 :	// 0 단계 : 4마리 순차적 생성	>> 총 4
 				for(var i = 0; i<4;i++){
-	 				self.spawnMonster(1000+i*150,Math.random()*450);
+	 				self.spawnMonster(1000+i*150,Math.random()*420);
 				}
 				break;
 			case 1 :	// 1 단계 : 3마리 + 1열로 4~6마리 + 랜덤 2마리 >> 총 9~11
-				self.spawnMonster(1000,Math.random()*450);
-				self.spawnMonster(1300,Math.random()*450);
-				self.spawnMonster(1450,Math.random()*450);
+				self.spawnMonster(1000,Math.random()*420);
+				self.spawnMonster(1300,Math.random()*420);
+				self.spawnMonster(1450,Math.random()*420);
 				var ran = Math.floor(4+Math.random()*2)
 				for(var i =0; i<ran;i++){
 					self.spawnMonster(1150,30+Math.random()*60+i*60);
 				}
 				for(var i=0;i<2;i++){ 	//랜덤으로 2마리 생성
-					self.spawnMonster(1000+Math.random()*450,Math.random()*450);
+					self.spawnMonster(1000+Math.random()*450,Math.random()*420);
 				}
 
 				break;
 			case 2 :	// 2 단계 : 1마리 + 8*2마리 + 랜덤 7마리 >> 총 22
-				self.spawnMonster(1000,Math.random()*450);
+				self.spawnMonster(1000,Math.random()*420);
 				for(var i=0;i<8;i++){
 					for(var j=0;j<2;j++){
 						self.spawnMonster(1150+i*150,60+j*60);
 					}
 				}
 				for(var i=0;i<7;i++){ 	//랜덤으로 7마리 생성
-					self.spawnMonster(1000+Math.random()*450,Math.random()*450);
+					self.spawnMonster(1000+Math.random()*420,Math.random()*420);
 				}
 				break;
 			case 3 :	// 3 단계 : 5*6마리 + 랜덤 10마리 >> 총 40
@@ -438,7 +440,7 @@ CanvasManager.prototype.monsterWave = function() {	// 몬스터 웨이브
 					}
 				}
 				for(var i=0;i<10;i++){ 	//랜덤으로 10마리 생성
-					self.spawnMonster(1000+Math.random()*450,Math.random()*450);
+					self.spawnMonster(1000+Math.random()*450,Math.random()*420);
 				}
 				break;
 			case 4 :	// 4 단계 : 10 * 7마리 + 랜덤 15마리 >> 총 85
@@ -448,7 +450,7 @@ CanvasManager.prototype.monsterWave = function() {	// 몬스터 웨이브
 					}
 				}
 				for(var i=0;i<15;i++){ 	//랜덤으로 15마리 생성
-					self.spawnMonster(1000+Math.random()*450,Math.random()*450);
+					self.spawnMonster(1000+Math.random()*450,Math.random()*420);
 				}
 				break;
 		}
@@ -583,6 +585,7 @@ CanvasManager.prototype.reStart = function(){	// 재시작
 	
 	updateInterval = window.setInterval("manager.update()",1000/60);
 	self.waveStartTime = performance.now();
+	self.waveTime = performance.now()-3000;
 	self.removeMenuEvent();
 	self.addKeyEvent();
 }
@@ -673,23 +676,23 @@ Monster.prototype.init = function() {	// 초기화
 			this.img = images.Slime;
 			break;
 		case "Snail" :
-			this.width = 42;
-			this.height = 33;
+			this.width = 37;
+			this.height = 26;
 			this.hp = 30;
 			this.point = 10;
 			this.vx = -3;
 			this.img = images.Snail;
 			break;
 		case "Resh" :
-			this.width = 65;
-			this.height = 56;
+			this.width = 64;
+			this.height = 54;
 			this.hp = 200;
 			this.point = 60;
 			this.vx = -2.5;
 			this.img = images.Resh;
 			break;
 		case "Harf" :
-			this.width = 73;
+			this.width = 68;
 			this.height = 96;
 			this.hp = 300;
 			this.point = 85;
@@ -705,7 +708,7 @@ Monster.prototype.init = function() {	// 초기화
 			this.vx = -3;
 			break;
 		case "DualBurk" :
-			this.width = 93;
+			this.width = 92;
 			this.height = 70;
 			this.hp = 2500;
 			this.point = 200;
@@ -713,16 +716,16 @@ Monster.prototype.init = function() {	// 초기화
 			this.img = images.DualBurk;
 			break;
 		case "Ghost" :
-			this.width = 67;
-			this.height = 92;
+			this.width = 63;
+			this.height = 91;
 			this.hp = 8000;
 			this.point = 300;
 			this.vx = -2.2;
 			this.img = images.Ghost;
 			break;
 		case "Dragon" :
-			this.width = 77;
-			this.height = 54;
+			this.width = 76;
+			this.height = 53;
 			this.hp = 12000;
 			this.point = 460;
 			this.vx = -1.5;
