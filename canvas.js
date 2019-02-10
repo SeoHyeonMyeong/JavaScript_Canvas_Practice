@@ -18,6 +18,12 @@ function inputReset() {	// 인풋 초기화
 	input.quit = false;
 }
 
+function ResultKeyEvent() {	// 결과 이벤트
+	manager.removeResultEvent();
+	manager.addMenuEvent();
+	manager.showMenu();
+}
+
 function keyDownEvent(e) {	// 키다운 이벤트
 	if(e.key==="ArrowUp"){
 			input.up = true;
@@ -73,6 +79,49 @@ function menuKeyEvent(e) {	// 메뉴창에서 스페이스바 누를시 재시�
 			manager.showMenu();
 		}
 	}
+	if(e.key==="ArrowLeft"){
+		if(manager.themeNum>1){
+			manager.themeNum--;
+			switch(manager.themeNum){
+				case 1 :
+					manager.theme = "달팽이 농장";
+					break;
+				case 2 :
+					manager.theme = "버섯 골짜기";
+					break;
+				case 3 :
+					manager.theme = "깊은 숲";
+					break;
+				case 4 :
+					manager.theme = "어두운 동굴";
+					break;
+			}
+			manager.showMenu();
+			
+		}
+	}
+	if(e.key==="ArrowRight"){
+		if(manager.themeNum<5){
+			manager.themeNum++;
+			switch(manager.themeNum){
+				case 1 :
+					manager.theme = "달팽이 농장";
+					break;
+				case 2 :
+					manager.theme = "버섯 골짜기";
+					break;
+				case 3 :
+					manager.theme = "깊은 숲";
+					break;
+				case 4 :
+					manager.theme = "어두운 동굴";
+					break;
+			}
+			manager.showMenu();
+			
+		}
+	}
+
 }
 
 function clickEvent(e) {	// 클릭 이벤트
@@ -110,6 +159,48 @@ function clickEvent(e) {	// 클릭 이벤트
 	if(x>391&&x<411&&y>405&&y<425){	// 난이도 하락
 		if(manager.difficulty>1){
 			manager.difficulty--;
+			manager.showMenu();
+			
+		}
+	}
+	if(x>352&&x<373&&y>455&&y<477){	// 테마 좌로
+		if(manager.themeNum>1){
+			manager.themeNum--;
+			switch(manager.themeNum){
+				case 1 :
+					manager.theme = "달팽이 농장";
+					break;
+				case 2 :
+					manager.theme = "버섯 골짜기";
+					break;
+				case 3 :
+					manager.theme = "깊은 숲";
+					break;
+				case 4 :
+					manager.theme = "어두운 동굴";
+					break;
+			}
+			manager.showMenu();
+			
+		}
+	}
+	if(x>391&&x<411&&y>455&&y<477){	// 테마 우로
+		if(manager.themeNum<5){
+			manager.themeNum++;
+			switch(manager.themeNum){
+				case 1 :
+					manager.theme = "달팽이 농장";
+					break;
+				case 2 :
+					manager.theme = "버섯 골짜기";
+					break;
+				case 3 :
+					manager.theme = "깊은 숲";
+					break;
+				case 4 :
+					manager.theme = "어두운 동굴";
+					break;
+			}
 			manager.showMenu();
 			
 		}
@@ -174,7 +265,7 @@ Img.prototype.init = function() {	// 이미지 로드
 	this.length++;
 	this.GreenMushroom.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/GreenMushroom.png";
 	this.length++;
-	this.BlueMushroom.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/BlueMushroom.png";
+	this.BlueMushroom.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/GreenMushroom.png";
 	this.length++;
 	this.Steezy.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Steezy.png";
 	this.length++;
@@ -230,7 +321,10 @@ function CanvasManager() {
 	this.canvas = document.querySelector('.my-canvas');
 	this.canvasCtx = this.canvas.getContext('2d');
 	this.difficulty = 1; // 난이도 1
-	this.maxDifficulty = 1;	// 최대난이도
+	this.themeNum = 1;
+	this.theme = "달팽이 농장";
+	this.ifWin = false; // 승리여부
+	this.maxDifficulty = 40;	// 최대난이도
 	this.score = 0;	// 스코어 0
 	this.gold = 0;	// 골드 0
 	this.attackDamage = 30;	// 데미지 30
@@ -245,7 +339,7 @@ function CanvasManager() {
 	this.waveDeltaTime = 0;	// 웨이브 델타타임
 	this.waveTime = performance.now()-3000;	// 웨이브 시간
 	this.waveStartTime = performance.now();
-	this.waveEndTime = 36000;
+	this.waveEndTime = 30000;
 	this.monster1 = "Snail";
 	this.monster2 = "BlueSnail";
 	this.monster3 = "RedSnail";
@@ -299,6 +393,14 @@ CanvasManager.prototype.addKeyEvent = function() {		// 키 이벤트 추가
 CanvasManager.prototype.removeKeyDownEvent = function() {	// 키 이벤트 삭제
 	document.removeEventListener("keydown",keyDownEvent);
 	document.removeEventListener("keyup",keyUpEvent);
+}
+
+CanvasManager.prototype.addResultEvent = function() {	// 결과 이벤트 추가
+	document.addEventListener("keydown",ResultKeyEvent);
+}
+
+CanvasManager.prototype.removeResultEvent = function() {	// 결과 이벤트 삭제
+	document.removeEventListener("keydown",ResultKeyEvent);
 }
 
 CanvasManager.prototype.addMenuEvent = function() {	// 메뉴에서 이벤트 추가
@@ -372,7 +474,7 @@ CanvasManager.prototype.monsterWave = function() {	// 몬스터 웨이브
 	switch(Math.floor(self.difficulty/5)) {
 		case 0 :
 			wavelevel = Math.random()<1? 0:1;
-			self.waveDelay = 6000;
+			self.waveDelay = 6500;
 			break;
 		case 1 :
 			wavelevel = Math.random()<0.7? 0:1;
@@ -522,10 +624,7 @@ CanvasManager.prototype.checkDamage = function() {	// 데미지가 0.4초후 사
 CanvasManager.prototype.checkWin = function() {	// 승리 확인
 	var self = this;
 	if(performance.now()-self.waveStartTime>self.waveEndTime) {
-		self.gold += self.score;	// 추가 골드
-		if(self.difficulty===self.maxDifficulty) {
-			self.maxDifficulty++;
-		}
+		self.ifWin = true;
 		input.quit = true;
 	}
 	this.canvasCtx.font = "16px Arial";
@@ -554,10 +653,37 @@ CanvasManager.prototype.quit = function() {	// quit 눌렷을시
 	inputReset();
 	window.clearInterval(updateInterval); 	// 인터벌 제거
 	self.removeKeyDownEvent();
-	self.addMenuEvent();	// 메뉴 이벤트로 대체
-	self.gold += self.score;
+	self.addResultEvent();	// 결과 이벤트로 대체
+	self.showResult();
+}
+
+CanvasManager.prototype.showResult = function() {	// 결과출력
+	var self = this;
+	this.canvasCtx.fillStyle = "rgba(255,255,255,1)";
+	this.canvasCtx.fillRect(0,0,1000,500);
+	this.canvasCtx.font = "30px Arial";
+	this.canvasCtx.fillStyle = "#008899";
+	this.canvasCtx.fillText("결과",20,40);
+	if(self.ifWin){
+		self.canvasCtx.fillStyle = "#00cc00";
+		self.canvasCtx.fillText(self.theme + "(" + self.difficulty + ")" + " 승리",20,90);
+		self.gold += self.score*2;
+		this.canvasCtx.fillStyle = "#0000cc";
+		this.canvasCtx.fillText("점수: " + self.score,20,140);
+		this.canvasCtx.fillText("골드: " + self.gold + "(+" + self.score*2 + ")",20,190);
+	}
+	else {
+		self.canvasCtx.fillStyle = "#666666";
+		self.canvasCtx.fillText(self.theme + "(" + self.difficulty + ")" + " 패배",20,90);
+		self.gold += self.score;
+		this.canvasCtx.fillStyle = "#0000cc";
+		this.canvasCtx.fillText("점수: " + self.score,20,140);
+		this.canvasCtx.fillText("골드: " + self.gold + "(+" + self.score + ")",20,190);
+	}
+	self.ifWin = false;
 	self.score = 0;
-	self.showMenu();
+	self.canvasCtx.fillStyle = "#66ffcc";
+	self.canvasCtx.fillText("아무키나 눌러 주세요.",360,400);
 }
 
 CanvasManager.prototype.showMenu = function() {	// 메뉴 출력
@@ -578,6 +704,9 @@ CanvasManager.prototype.showMenu = function() {	// 메뉴 출력
 	this.canvasCtx.fillStyle = "#12fee3";
 	this.canvasCtx.fillText("난이도: " + self.difficulty ,20,290);
 	this.canvasCtx.fillText("▲ ▼",300,290);
+	this.canvasCtx.fillStyle = "#888888";
+	this.canvasCtx.fillText("지역: " + self.theme , 20,340);
+	this.canvasCtx.fillText("◀ ▶",300,340);
 	this.canvasCtx.fillStyle = "#bea312";
 	this.canvasCtx.fillText("멀티화살: " + self.arrowMulti + " (cost: " + self.arrowMulti*10000 + ")",500,190);
 	this.canvasCtx.fillStyle = "#5555ee";
@@ -592,21 +721,32 @@ CanvasManager.prototype.reStart = function(){	// 재시작
 	self.character.y = 20;
 	self.monster = [];
 	self.arrow = [];
-	self.monster1 = "Snail";
-	self.monster2 = "Slime";
-	if(self.difficulty>=10){
-		self.monster1 = "Resh";
-		self.monster2 = "Harf";
-	}
-	if(self.difficulty>=20){
-		self.monster1 = "Threetale";
-		self.monster2 = "DualBurk";
-	}
-	if(self.difficulty>=30){
-		self.monster1 = "Ghost";
-		self.monster2 = "Dragon";
-	}
-	
+	switch(self.themeNum){
+				case 1 :
+				self.theme = "달팽이 농장"
+					self.monster1 = "Snail";
+					self.monster2 = "BlueSnail";
+					self.monster3 = "RedSnail";
+					break;
+				case 2 :
+					self.theme = "버섯 골짜기";
+					self.monster1 = "OrangeMushroom";
+					self.monster2 = "GreenMushroom";
+					self.monster3 = "BlueMushroom";
+					break;
+				case 3 :
+					self.theme = "깊은 숲";
+					self.monster1 = "Resh";
+					self.monster2 = "Threetale";
+					self.monster3 = "Harf";
+					break;
+				case 4 :
+					self.theme = "어두운 동굴";
+					self.monster1 = "DualBurk";
+					self.monster2 = "Ghost";
+					self.monster3 = "Dragon";
+					break;
+			}
 	updateInterval = window.setInterval("manager.update()",1000/60);
 	self.waveStartTime = performance.now();
 	self.waveTime = performance.now()-3000;
@@ -685,8 +825,7 @@ function Monster(x,y,name) {	// 몬스터
 	this.y = y;
 	this.vx = -2.5;
 	this.vy = 0;
-	this.g = 0;
-	this.gChangeTime = 1000;
+	this.vyChangeTime = 1000;
 	this.name = name;
 	this.point = 10;
 	this.initTime = performance.now();
@@ -709,8 +848,6 @@ Monster.prototype.init = function() {	// 초기화
 			this.hp = 30;
 			this.point = 10;
 			this.vx = -3.25;
-			this.g = 0.3;
-			this.gChangeTime = 500;
 			this.img = images.Snail;
 			break;
 		case "RedSnail" :
@@ -722,8 +859,8 @@ Monster.prototype.init = function() {	// 초기화
 			this.img = images.RedSnail;
 			break; 
 		case "BlueSnail" :
-			this.width = 37;
-			this.height = 26;
+			this.width = 35*1.1;
+			this.height = 34*1.1;
 			this.hp = 50;
 			this.point = 20;
 			this.vx = -2.75;
@@ -759,9 +896,9 @@ Monster.prototype.init = function() {	// 초기화
 			this.hp = 150;
 			this.point = 120;
 			this.vx = -3;
-			this.g = 0.3;
-			this.gChangeTime = 500;
-			this.img = images.Snail;
+			this.vy = 2;
+			this.vyChangeTime = 500;
+			this.img = images.Steezy;
 			break; 
 		case "Resh" :
 			this.width = 64;
@@ -844,12 +981,11 @@ Monster.prototype.checkCollision = function() {	// 몬스터와 화살 충돌 �
 
 Monster.prototype.draw = function() {	// 몬스터 그리기
 	var self = this;
-	if(performance.now()-self.initTime<self.gChangeTime){
+	if(performance.now()-self.initTime>self.vyChangeTime){
 		self.initTime = performance.now();
-		self.g = -self.g;
+		self.vy = -self.vy;
 	}
-	self.vy += self.g;
-	self.x += self.vx ;
+	self.x += self.vx;
 	self.y += self.vy;
 
 	self.canvasCtx.drawImage(self.img,self.x,self.y,self.width,self.height);
