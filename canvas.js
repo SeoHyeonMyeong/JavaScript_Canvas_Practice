@@ -86,7 +86,7 @@ function clickEvent(e) {	// 클릭 이벤트
 	if(x>71&&x<370&&y>303&&y<331){	// 데미지 증가
 		if(manager.attackDamage*10<=manager.gold){
 			manager.gold -= manager.attackDamage*10;
-			manager.attackDamage+=10;
+			manager.attackDamage+=5;
 			manager.showMenu();
 			
 		}
@@ -94,7 +94,7 @@ function clickEvent(e) {	// 클릭 이벤트
 	if(x>71&&x<359&&y>353&&y<381){	// 속도 증가
 		if(manager.agility*5<=manager.gold){
 			manager.gold -= manager.agility*5;
-			manager.agility += 5;
+			manager.agility += 4;
 			manager.arrowDelay = 60000 / manager.agility;
 			manager.showMenu();
 			
@@ -125,7 +125,7 @@ function clickEvent(e) {	// 클릭 이벤트
 	if(x>552&&x<881&&y>353&&y<381){	// 크리티컬 확률 증가
 		if(manager.critical<0.5&&manager.critical*10000<=manager.gold){
 			manager.gold -= manager.critical*10000;
-			manager.critical+=0.05;
+			manager.critical+=0.02;
 			manager.showMenu();
 			
 		}
@@ -140,6 +140,12 @@ function Img() {	// 이미지
 	this.Stitch = new Image();
 	this.Star = new Image();
 	this.Snail = new Image();
+	this.BlueSnail = new Image();
+	this.RedSnail = new Image();
+	this.OrangeMushroom = new Image();
+	this.GreenMushroom = new Image();
+	this.BlueMushroom = new Image();
+	this.Steezy = new Image();
 	this.Slime = new Image();
 	this.Resh = new Image();
 	this.Harf = new Image();
@@ -160,6 +166,18 @@ Img.prototype.init = function() {	// 이미지 로드
 	this.length++;
 	this.Snail.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Snail.png";
 	this.length++;
+	this.BlueSnail.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/BlueSnail.png";
+	this.length++;
+	this.RedSnail.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/RedSnail.png";
+	this.length++;
+	this.OrangeMushroom.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/OrangeMushroom.png";
+	this.length++;
+	this.GreenMushroom.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/GreenMushroom.png";
+	this.length++;
+	this.BlueMushroom.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/BlueMushroom.png";
+	this.length++;
+	this.Steezy.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Steezy.png";
+	this.length++;
 	this.Slime.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Slime.png";
 	this.length++;
 	this.Resh.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Resh.PNG";
@@ -179,9 +197,15 @@ Img.prototype.init = function() {	// 이미지 로드
 }
 
 Img.prototype.addEvent = function() {	// 로드 이벤트 추가
-	this. Stitch.addEventListener("load",imgOnLoad,false);
+	this.Stitch.addEventListener("load",imgOnLoad,false);
 	this.Star.addEventListener("load",imgOnLoad,false);
 	this.Snail.addEventListener("load",imgOnLoad,false);
+	this.BlueSnail.addEventListener("load",imgOnLoad,false);
+	this.RedSnail.addEventListener("load",imgOnLoad,false);
+	this.OrangeMushroom.addEventListener("load",imgOnLoad,false);
+	this.GreenMushroom.addEventListener("load",imgOnLoad,false);
+	this.BlueMushroom.addEventListener("load",imgOnLoad,false);
+	this.Steezy.addEventListener("load",imgOnLoad,false);
 	this.Slime.addEventListener("load",imgOnLoad,false);
 	this.Resh.addEventListener("load",imgOnLoad,false);
 	this.Harf.addEventListener("load",imgOnLoad,false);
@@ -209,7 +233,7 @@ function CanvasManager() {
 	this.maxDifficulty = 1;	// 최대난이도
 	this.score = 0;	// 스코어 0
 	this.gold = 0;	// 골드 0
-	this.attackDamage = 40;	// 데미지 40
+	this.attackDamage = 30;	// 데미지 30
 	this.agility = 60;	// 공격속도
 	this.critical = 0.1;	// 크리율
 	this.criticalDamage = 2;	// 크리 배율
@@ -223,7 +247,8 @@ function CanvasManager() {
 	this.waveStartTime = performance.now();
 	this.waveEndTime = 36000;
 	this.monster1 = "Snail";
-	this.monster2 = "Slime";
+	this.monster2 = "BlueSnail";
+	this.monster3 = "RedSnail";
 	this.character = new Character(20,20);
 	this.arrow = [];
 	this.monster = [];
@@ -462,10 +487,9 @@ CanvasManager.prototype.spawnMonster = function(x,y) {	// 몬스터 생성
 	var self = this;
 	var randomX = x
 	var randomY = y
-	var randomName = Math.random()>0.7? self.monster2:self.monster1;
+	var temp = Math.random()<0.6? self.monster2:self.monster3;
+	var randomName = Math.random()<0.6? self.monster1:temp;
 	this.monster.push(new Monster(randomX,randomY,randomName));
-		
-	
 }
 
 CanvasManager.prototype.checkCollision = function() {	// 몬스터와 캐릭터 충돌 확인
@@ -660,8 +684,12 @@ function Monster(x,y,name) {	// 몬스터
 	this.x = x;
 	this.y = y;
 	this.vx = -2.5;
+	this.vy = 0;
+	this.g = 0;
+	this.gChangeTime = 1000;
 	this.name = name;
 	this.point = 10;
+	this.initTime = performance.now();
 	this.init();
 }
 
@@ -671,7 +699,7 @@ Monster.prototype.init = function() {	// 초기화
 			this.width = 69;
 			this.height = 47;
 			this.hp = 100;
-			this.point = 30;
+			this.point = 50;
 			this.vx = -2.5;
 			this.img = images.Slime;
 			break;
@@ -680,9 +708,61 @@ Monster.prototype.init = function() {	// 초기화
 			this.height = 26;
 			this.hp = 30;
 			this.point = 10;
-			this.vx = -3;
+			this.vx = -3.25;
+			this.g = 0.3;
+			this.gChangeTime = 500;
 			this.img = images.Snail;
 			break;
+		case "RedSnail" :
+			this.width = 35*1.1;
+			this.height = 34*1.1;
+			this.hp = 80;
+			this.point = 30;
+			this.vx = -3;
+			this.img = images.RedSnail;
+			break; 
+		case "BlueSnail" :
+			this.width = 37;
+			this.height = 26;
+			this.hp = 50;
+			this.point = 20;
+			this.vx = -2.75;
+			this.img = images.BlueSnail;
+			break; 
+		case "OrangeMushroom" :
+			this.width = 63;
+			this.height = 58;
+			this.hp = 150;
+			this.point = 60;
+			this.vx = -3;
+			this.img = images.OrangeMushroom;
+			break; 
+		case "GreenMushroom" :
+			this.width = 56;
+			this.height = 52;
+			this.hp = 200;
+			this.point = 80;
+			this.vx = -3.75;
+			this.img = images.GreenMushroom;
+			break; 
+		case "BlueMushroom" :
+			this.width = 63;
+			this.height = 58;
+			this.hp = 300;
+			this.point = 100;
+			this.vx = -3.5;
+			this.img = images.BlueMushroom;
+			break; 
+		case "Steezy" :
+			this.width = 46;
+			this.height = 30;
+			this.hp = 150;
+			this.point = 120;
+			this.vx = -3;
+			this.g = 0.3;
+			this.gChangeTime = 500;
+			this.img = images.Snail;
+			break; 
 		case "Resh" :
 			this.width = 64;
 			this.height = 54;
@@ -764,7 +844,14 @@ Monster.prototype.checkCollision = function() {	// 몬스터와 화살 충돌 �
 
 Monster.prototype.draw = function() {	// 몬스터 그리기
 	var self = this;
-	self.x += self.vx 
+	if(performance.now()-self.initTime<self.gChangeTime){
+		self.initTime = performance.now();
+		self.g = -self.g;
+	}
+	self.vy += self.g;
+	self.x += self.vx ;
+	self.y += self.vy;
+
 	self.canvasCtx.drawImage(self.img,self.x,self.y,self.width,self.height);
 }
 
