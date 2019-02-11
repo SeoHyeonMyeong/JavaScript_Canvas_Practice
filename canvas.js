@@ -265,7 +265,7 @@ Img.prototype.init = function() {	// 이미지 로드
 	this.length++;
 	this.GreenMushroom.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/GreenMushroom.png";
 	this.length++;
-	this.BlueMushroom.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/GreenMushroom.png";
+	this.BlueMushroom.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/BlueMushroom.png";
 	this.length++;
 	this.Steezy.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Steezy.png";
 	this.length++;
@@ -653,7 +653,7 @@ CanvasManager.prototype.quit = function() {	// quit 눌렷을시
 	inputReset();
 	window.clearInterval(updateInterval); 	// 인터벌 제거
 	self.removeKeyDownEvent();
-	self.addResultEvent();	// 결과 이벤트로 대체
+	window.setTimeout("manager.addResultEvent()",1000);	// 결과 이벤트로 대체
 	self.showResult();
 }
 
@@ -682,8 +682,9 @@ CanvasManager.prototype.showResult = function() {	// 결과출력
 	}
 	self.ifWin = false;
 	self.score = 0;
-	self.canvasCtx.fillStyle = "#66ffcc";
+	self.canvasCtx.fillStyle = "#ff66cc";
 	self.canvasCtx.fillText("아무키나 눌러 주세요.",360,400);
+	
 }
 
 CanvasManager.prototype.showMenu = function() {	// 메뉴 출력
@@ -737,8 +738,8 @@ CanvasManager.prototype.reStart = function(){	// 재시작
 				case 3 :
 					self.theme = "깊은 숲";
 					self.monster1 = "Resh";
-					self.monster2 = "Threetale";
-					self.monster3 = "Harf";
+					self.monster2 = "Harf";
+					self.monster3 = "Steezy";
 					break;
 				case 4 :
 					self.theme = "어두운 동굴";
@@ -893,7 +894,7 @@ Monster.prototype.init = function() {	// 초기화
 		case "Steezy" :
 			this.width = 46;
 			this.height = 30;
-			this.hp = 150;
+			this.hp = 200;
 			this.point = 120;
 			this.vx = -3;
 			this.vy = 2;
@@ -903,7 +904,7 @@ Monster.prototype.init = function() {	// 초기화
 		case "Resh" :
 			this.width = 64;
 			this.height = 54;
-			this.hp = 200;
+			this.hp = 500;
 			this.point = 60;
 			this.vx = -2.5;
 			this.img = images.Resh;
@@ -911,7 +912,7 @@ Monster.prototype.init = function() {	// 초기화
 		case "Harf" :
 			this.width = 68;
 			this.height = 96;
-			this.hp = 300;
+			this.hp = 900;
 			this.point = 85;
 			this.vx = -3;
 			this.img = images.Harf;
@@ -919,7 +920,7 @@ Monster.prototype.init = function() {	// 초기화
 		case "Threetale" :
 			this.width = 95;
 			this.height = 75;
-			this.hp = 1000;
+			this.hp = 1500;
 			this.point = 120;
 			this.img = images.Threetale;
 			this.vx = -3;
@@ -935,7 +936,7 @@ Monster.prototype.init = function() {	// 초기화
 		case "Ghost" :
 			this.width = 63;
 			this.height = 91;
-			this.hp = 8000;
+			this.hp = 7000;
 			this.point = 300;
 			this.vx = -2.2;
 			this.img = images.Ghost;
@@ -943,7 +944,7 @@ Monster.prototype.init = function() {	// 초기화
 		case "Dragon" :
 			this.width = 76;
 			this.height = 53;
-			this.hp = 12000;
+			this.hp = 13000;
 			this.point = 460;
 			this.vx = -1.5;
 			this.img = images.Dragon;
