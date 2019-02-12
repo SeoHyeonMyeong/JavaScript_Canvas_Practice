@@ -95,6 +95,9 @@ function menuKeyEvent(e) {	// 메뉴창에서 스페이스바 누를시 재시�
 				case 4 :
 					manager.theme = "어두운 동굴";
 					break;
+				case 5 :
+					manager.theme = "슬라임 본거지";
+					break;
 			}
 			manager.showMenu();
 			
@@ -115,6 +118,9 @@ function menuKeyEvent(e) {	// 메뉴창에서 스페이스바 누를시 재시�
 					break;
 				case 4 :
 					manager.theme = "어두운 동굴";
+					break;
+				case 5 :
+					manager.theme = "슬라임 본거지";
 					break;
 			}
 			manager.showMenu();
@@ -179,6 +185,9 @@ function clickEvent(e) {	// 클릭 이벤트
 				case 4 :
 					manager.theme = "어두운 동굴";
 					break;
+				case 5 :
+					manager.theme = "슬라임 본거지";
+					break;
 			}
 			manager.showMenu();
 			
@@ -199,6 +208,9 @@ function clickEvent(e) {	// 클릭 이벤트
 					break;
 				case 4 :
 					manager.theme = "어두운 동굴";
+					break;
+				case 5 :
+					manager.theme = "슬라임 본거지";
 					break;
 			}
 			manager.showMenu();
@@ -347,6 +359,7 @@ function CanvasManager() {
 	this.arrow = [];
 	this.monster = [];
 	this.damage = [];
+	this.EnemyAttack = [];
 	this.init();
 }
 
@@ -375,6 +388,9 @@ CanvasManager.prototype.update = function() {	// 업데이트
 		instance.draw();
 	});
 	self.damage.forEach(function (instance){
+		instance.draw();
+	});
+	self.EnemyAttack.forEach(function (instance){
 		instance.draw();
 	});
 	self.drawScore();
@@ -594,11 +610,11 @@ CanvasManager.prototype.spawnMonster = function(x,y) {	// 몬스터 생성
 	this.monster.push(new Monster(randomX,randomY,randomName));
 }
 
-CanvasManager.prototype.checkCollision = function() {	// 몬스터와 캐릭터 충돌 확인
+CanvasManager.prototype.checkCollision = function() {	
 	var self = this;
 	var target = self.character
 	var n = 0;
-	self.monster.forEach(function (obstacle) {
+	self.monster.forEach(function (obstacle) {	// 몬스터와 캐릭터 충돌 확인
 		var condition1 = target.x+target.width>obstacle.x && target.x<obstacle.x && target.y+target.height>obstacle.y && target.y<obstacle.y;
 		var condition2 = target.x<obstacle.x+obstacle.width && target.x+target.width>obstacle.x+obstacle.width && target.y+target.height>obstacle.y && target.y< obstacle.y;
 		var condition3 = target.x+target.width>obstacle.x && target.x < obstacle.x && target.y < obstacle.y + obstacle.height && target.y+target.height > obstacle.y+obstacle.height;
@@ -610,6 +626,16 @@ CanvasManager.prototype.checkCollision = function() {	// 몬스터와 캐릭터 
 		obstacle.checkCollision(self.arrow);	// 몬스터와 화살 충돌 확인
 		self.monsterHpCheck(n);	// 몬스터 사망 확인
 		n++;
+	});
+	
+	self.EnemyAttack.forEach(function(obstacle){	// 적 공격과 캐릭터 충돌 확인
+		var condition1 = target.x+target.width>obstacle.x && target.x<obstacle.x && target.y+target.height>obstacle.y && target.y<obstacle.y;
+		var condition2 = target.x<obstacle.x+obstacle.width && target.x+target.width>obstacle.x+obstacle.width && target.y+target.height>obstacle.y && target.y< obstacle.y;
+		var condition3 = target.x+target.width>obstacle.x && target.x < obstacle.x && target.y < obstacle.y + obstacle.height && target.y+target.height > obstacle.y+obstacle.height;
+		var condition4 = target.x<obstacle.x+obstacle.width && target.x+target.width > obstacle.x + obstacle.width && target.y < obstacle.y + obstacle.height && target.y + target.height > obstacle.y + obstacle.height;
+		if(condition1 || condition2 || condition3 || condition4 ){	// 충돌 시
+			input.quit = true;
+		}
 	});
 }
 
@@ -634,6 +660,12 @@ CanvasManager.prototype.checkWin = function() {	// 승리 확인
 
 CanvasManager.prototype.monsterHpCheck = function(n) {	// 몬스터 사망 확인
 	var self = this;
+	if(self.monster[n].isBoss&&self.monster[n].hp<=0){	// 보스가 사망시
+		self.ifWin = true;
+		input.quit = true;
+		self.score += self.monster[n].point;
+		self.monster.splice(n,1);
+	}
 	if(self.monster[n].hp<=0){
 		self.score += self.monster[n].point;
 		self.monster.splice(n,1);
@@ -722,6 +754,7 @@ CanvasManager.prototype.reStart = function(){	// 재시작
 	self.character.y = 20;
 	self.monster = [];
 	self.arrow = [];
+	self.EnemyAttack = [];
 	switch(self.themeNum){
 				case 1 :
 				self.theme = "달팽이 농장"
@@ -746,6 +779,14 @@ CanvasManager.prototype.reStart = function(){	// 재시작
 					self.monster1 = "DualBurk";
 					self.monster2 = "Ghost";
 					self.monster3 = "Dragon";
+					break;
+				case 5 :
+					self.theme = "슬라임 본거지";
+					self.monster1 = null;
+					self.monster2 = null;
+					self.monster3 = null;
+					self.monster.push(new Boss());
+					self.waveEndTime = 1000000;
 					break;
 			}
 	updateInterval = window.setInterval("manager.update()",1000/60);
@@ -949,6 +990,14 @@ Monster.prototype.init = function() {	// 초기화
 			this.vx = -1.5;
 			this.img = images.Dragon;
 			break;
+		case null :
+			this.hp = 0;
+			this.width = 0;
+			this.height = 0;
+			this.img = images.Slime;
+			this.vx = 0;
+			this.point = 0;
+			break;
 		default :
 			this.width = 67;
 			this.height = 92;
@@ -957,6 +1006,7 @@ Monster.prototype.init = function() {	// 초기화
 			this.vx = -3;
 			this.name = "Snail";
 			this.img = Images.Snail;
+			break;
 	}
 
 }
@@ -1014,6 +1064,89 @@ Damage.prototype.draw = function() {
 	this.canvasCtx.fillText(self.value,self.x,self.y);
 }
 
+// Boss.js
+function Boss() {
+	this.canvas = document.querySelector('.my-canvas');
+	this.canvasCtx = this.canvas.getContext('2d');
+	this.isBoss = true;
+	this.x = 700;
+	this.y = 150;
+	this.width = 206*1.4;
+	this.height = 142*1.4
+	this.maxHp = 10000;
+	this.hp = 10000;
+	this.point = 5000;
+	this.img = images.Slime;
+	this.attackDelay = 700;
+	this.attackTime = performance.now();
+	this.attackDeltaTime = 0;
+}
+
+Boss.prototype.checkAttack = function () {
+	var self = this;
+	this.attackDeltaTime = performance.now() - this.attackTime;
+	if(this.attackDelay<this.attackDeltaTime){
+		self.attackTime = performance.now();
+		manager.EnemyAttack.push(new EnemyAttack(1000,Math.random()*450,-5,0,"Star",100));
+	}
+}
+
+Boss.prototype.draw = function() {
+	var self = this;
+	self.checkAttack();
+	self.hpDraw();
+	self.canvasCtx.drawImage(self.img,self.x,self.y,self.width,self.height);
+
+}
+
+Boss.prototype.hpDraw = function() {
+	var self = this;
+	self.canvasCtx.strokeStyle = "#333333";
+	self.canvasCtx.strokeRect(200,10,600,20);
+	self.canvasCtx.fillStyle = "#cc0000";
+	self.canvasCtx.fillRect(200,10,self.hp/self.maxHp*600,20);
+}
+
+Boss.prototype.checkCollision = function() {	// 보스 몬스터와 화살 충돌 이벤트
+	var self = this;
+	var n =0;
+	manager.arrow.forEach(function (instance) {
+		var condition1 = self.x+self.width>instance.x && self.x<instance.x && self.y+self.height>instance.y && self.y<instance.y;
+		var condition2 = self.x<instance.x+instance.width && self.x+self.width>instance.x+instance.width && self.y+self.height>instance.y && self.y< instance.y;
+		var condition3 = self.x+self.width>instance.x && self.x < instance.x && self.y < instance.y + instance.height && self.y+self.height > instance.y+instance.height;
+		var condition4 = self.x<instance.x+instance.width && self.x+self.width > instance.x + instance.width && self.y < instance.y + instance.height && self.y + self.height > instance.y + instance.height;
+		if(condition1 || condition2 || condition3 || condition4){
+			self.hp-= instance.attackDamage;
+			manager.damage.push(new Damage(self.x+self.width/2,self.y,instance.attackDamage,instance.isCritical));
+			manager.arrow.splice(n,1);
+		}
+		n++;
+	});
+
+}
+
+// EnemyAttack.js
+function EnemyAttack(x,y,vx,vy,name,damage) {
+	this.canvas = document.querySelector('.my-canvas');
+	this.canvasCtx = this.canvas.getContext('2d');
+	this.x = x;
+	this.y = y;
+	this.width = 195*0.5;
+	this.height = 184*0.5; 
+	this.damage = damage;
+	this.vx = vx;
+	this.vy = vy;
+	this.name = name;
+	this.img = images.Star;
+}
+
+EnemyAttack.prototype.draw = function() {
+	var self = this;
+	self.x += self.vx;
+	self.y += self.vy;
+	self.canvasCtx.drawImage(self.img,self.x,self.y,self.width,self.height);
+
+}
 
 // Application.js
 var manager;
