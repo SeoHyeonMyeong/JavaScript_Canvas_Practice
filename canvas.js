@@ -82,23 +82,7 @@ function menuKeyEvent(e) {	// 메뉴창에서 스페이스바 누를시 재시�
 	if(e.key==="ArrowLeft"){
 		if(manager.themeNum>1){
 			manager.themeNum--;
-			switch(manager.themeNum){
-				case 1 :
-					manager.theme = "달팽이 농장";
-					break;
-				case 2 :
-					manager.theme = "버섯 골짜기";
-					break;
-				case 3 :
-					manager.theme = "깊은 숲";
-					break;
-				case 4 :
-					manager.theme = "어두운 동굴";
-					break;
-				case 5 :
-					manager.theme = "슬라임 본거지";
-					break;
-			}
+			manager.setTheme();
 			manager.showMenu();
 			
 		}
@@ -106,23 +90,7 @@ function menuKeyEvent(e) {	// 메뉴창에서 스페이스바 누를시 재시�
 	if(e.key==="ArrowRight"){
 		if(manager.themeNum<5){
 			manager.themeNum++;
-			switch(manager.themeNum){
-				case 1 :
-					manager.theme = "달팽이 농장";
-					break;
-				case 2 :
-					manager.theme = "버섯 골짜기";
-					break;
-				case 3 :
-					manager.theme = "깊은 숲";
-					break;
-				case 4 :
-					manager.theme = "어두운 동굴";
-					break;
-				case 5 :
-					manager.theme = "슬라임 본거지";
-					break;
-			}
+			manager.setTheme();
 			manager.showMenu();
 			
 		}
@@ -172,23 +140,7 @@ function clickEvent(e) {	// 클릭 이벤트
 	if(x>352&&x<373&&y>455&&y<477){	// 테마 좌로
 		if(manager.themeNum>1){
 			manager.themeNum--;
-			switch(manager.themeNum){
-				case 1 :
-					manager.theme = "달팽이 농장";
-					break;
-				case 2 :
-					manager.theme = "버섯 골짜기";
-					break;
-				case 3 :
-					manager.theme = "깊은 숲";
-					break;
-				case 4 :
-					manager.theme = "어두운 동굴";
-					break;
-				case 5 :
-					manager.theme = "슬라임 본거지";
-					break;
-			}
+			manager.setTheme();
 			manager.showMenu();
 			
 		}
@@ -196,23 +148,7 @@ function clickEvent(e) {	// 클릭 이벤트
 	if(x>391&&x<411&&y>455&&y<477){	// 테마 우로
 		if(manager.themeNum<5){
 			manager.themeNum++;
-			switch(manager.themeNum){
-				case 1 :
-					manager.theme = "달팽이 농장";
-					break;
-				case 2 :
-					manager.theme = "버섯 골짜기";
-					break;
-				case 3 :
-					manager.theme = "깊은 숲";
-					break;
-				case 4 :
-					manager.theme = "어두운 동굴";
-					break;
-				case 5 :
-					manager.theme = "슬라임 본거지";
-					break;
-			}
+			manager.setTheme();
 			manager.showMenu();
 			
 		}
@@ -490,54 +426,43 @@ CanvasManager.prototype.monsterWave = function() {	// 몬스터 웨이브
 	switch(Math.floor(self.difficulty/5)) {
 		case 0 :
 			wavelevel = Math.random()<1? 0:1;
-			self.waveDelay = 6500;
 			break;
 		case 1 :
 			wavelevel = Math.random()<0.7? 0:1;
-			self.waveDelay = 5800;
 			break;
 		case 2 :
 			templevel = Math.random()<0.95? 1:2;
 			wavelevel = Math.random()<0.6? 0:templevel;
-			self.waveDelay = 5600;
 			break;
 		case 3 :
 			templevel = Math.random()<0.8? 1:2;
 			wavelevel = Math.random()<0.4? 0:templevel;
-			self.waveDelay = 5600;
 			break;
 		case 4 :
 			templevel = Math.random()<0.5? 1:2;
 			wavelevel = Math.random()<0.2? 0:templevel;
-			self.waveDelay = 5400;
 			break;
 		case 5 :
 			wavelevel = Math.random()<0.5? 1:2;
-			self.waveDelay = 5400;
 			break;
 		case 6 :
 			templevel = Math.random()<0.9? 2:3;
 			wavelevel = Math.random()<0.4? 1:templevel;
-			self.waveDelay = 5000;
 			break;
 		case 7 :
 			templevel = Math.random()<0.75? 2:3;
 			wavelevel = Math.random()<0.3? 1:templevel;
-			self.waveDelay = 5000;
 			break;
 		case 8 :
 			templevel = Math.random()<0.5? 2:3;
 			wavelevel = Math.random()<0.2? 1:templevel;
-			self.waveDelay = 4800;
 			break;
 		case 9 :
 			wavelevel = Math.random()<0.5? 2:3;
-			self.waveDelay = 4800;
 			break;
 		case 10 :
 			templevel = Math.random()<0.75? 3:4;
 			wavelevel = Math.random()<0.3? 1:templevel;
-			self.waveDelay = 4800;
 			break;
 		default :
 			break;
@@ -569,7 +494,7 @@ CanvasManager.prototype.monsterWave = function() {	// 몬스터 웨이브
 				self.spawnMonster(1000,Math.random()*420);
 				for(var i=0;i<8;i++){
 					for(var j=0;j<2;j++){
-						self.spawnMonster(1150+i*150,60+j*60);
+						self.spawnMonster(1150+i*150,190+j*80);
 					}
 				}
 				for(var i=0;i<7;i++){ 	//랜덤으로 7마리 생성
@@ -614,26 +539,22 @@ CanvasManager.prototype.checkCollision = function() {
 	var self = this;
 	var target = self.character
 	var n = 0;
-	self.monster.forEach(function (obstacle) {	// 몬스터와 캐릭터 충돌 확인
-		var condition1 = target.x+target.width>obstacle.x && target.x<obstacle.x && target.y+target.height>obstacle.y && target.y<obstacle.y;
-		var condition2 = target.x<obstacle.x+obstacle.width && target.x+target.width>obstacle.x+obstacle.width && target.y+target.height>obstacle.y && target.y< obstacle.y;
-		var condition3 = target.x+target.width>obstacle.x && target.x < obstacle.x && target.y < obstacle.y + obstacle.height && target.y+target.height > obstacle.y+obstacle.height;
-		var condition4 = target.x<obstacle.x+obstacle.width && target.x+target.width > obstacle.x + obstacle.width && target.y < obstacle.y + obstacle.height && target.y + target.height > obstacle.y + obstacle.height;
-		var condition5 = obstacle.x <= 0;
-		if(condition1 || condition2 || condition3 || condition4 || condition5){	// 충돌 또는 몬스터 도착시
+	self.monster.forEach(function (instance) {	// 몬스터와 캐릭터 충돌 확인
+		var condition1 = instance.x < target.x + target.width && instance.x + instance.width > target.x;
+        var condition2 = instance.y < target.y + target.height && instance.y + instance.height > target.y;
+		var condition3 = instance.x <= 0;
+		if(condition1 && condition2 || condition3){	// 충돌 또는 몬스터 도착시
 			input.quit = true;
 		}
-		obstacle.checkCollision(self.arrow);	// 몬스터와 화살 충돌 확인
+		instance.checkCollision(self.arrow);	// 몬스터와 화살 충돌 확인
 		self.monsterHpCheck(n);	// 몬스터 사망 확인
 		n++;
 	});
 	
-	self.EnemyAttack.forEach(function(obstacle){	// 적 공격과 캐릭터 충돌 확인
-		var condition1 = target.x+target.width>obstacle.x && target.x<obstacle.x && target.y+target.height>obstacle.y && target.y<obstacle.y;
-		var condition2 = target.x<obstacle.x+obstacle.width && target.x+target.width>obstacle.x+obstacle.width && target.y+target.height>obstacle.y && target.y< obstacle.y;
-		var condition3 = target.x+target.width>obstacle.x && target.x < obstacle.x && target.y < obstacle.y + obstacle.height && target.y+target.height > obstacle.y+obstacle.height;
-		var condition4 = target.x<obstacle.x+obstacle.width && target.x+target.width > obstacle.x + obstacle.width && target.y < obstacle.y + obstacle.height && target.y + target.height > obstacle.y + obstacle.height;
-		if(condition1 || condition2 || condition3 || condition4 ){	// 충돌 시
+	self.EnemyAttack.forEach(function(instance){	// 적 공격과 캐릭터 충돌 확인
+		var condition1 = instance.x < target.x + target.width && instance.x + instance.width > target.x;
+        var condition2 = instance.y < target.y + target.height && instance.y + instance.height > target.y;
+        if(condition1 && condition2){	// 충돌 시
 			input.quit = true;
 		}
 	});
@@ -730,14 +651,14 @@ CanvasManager.prototype.showMenu = function() {	// 메뉴 출력
 	this.canvasCtx.fillText("Gold: " + self.gold,20,90);
 	this.canvasCtx.fillStyle = "#998800";
 	this.canvasCtx.fillText("재시작",20,140);
-	this.canvasCtx.fillStyle = "#666666";
+	this.canvasCtx.fillStyle = "#990000";
 	this.canvasCtx.fillText("공격력: " + self.attackDamage + " (cost: " + self.attackDamage*10 + ")",20,190);
 	this.canvasCtx.fillStyle = "#fe12e3";
 	this.canvasCtx.fillText("공속: " + self.agility + " (cost: " + self.agility*5 + ")",20,240);
-	this.canvasCtx.fillStyle = "#12fee3";
+	this.canvasCtx.fillStyle = "#0033ff";
 	this.canvasCtx.fillText("난이도: " + self.difficulty ,20,290);
 	this.canvasCtx.fillText("▲ ▼",300,290);
-	this.canvasCtx.fillStyle = "#888888";
+	this.canvasCtx.fillStyle = "#555555";
 	this.canvasCtx.fillText("지역: " + self.theme , 20,340);
 	this.canvasCtx.fillText("◀ ▶",300,340);
 	this.canvasCtx.fillStyle = "#bea312";
@@ -755,40 +676,43 @@ CanvasManager.prototype.reStart = function(){	// 재시작
 	self.monster = [];
 	self.arrow = [];
 	self.EnemyAttack = [];
+	self.waveEndTime = 30000;
 	switch(self.themeNum){
-				case 1 :
-				self.theme = "달팽이 농장"
-					self.monster1 = "Snail";
-					self.monster2 = "BlueSnail";
-					self.monster3 = "RedSnail";
-					break;
-				case 2 :
-					self.theme = "버섯 골짜기";
-					self.monster1 = "OrangeMushroom";
-					self.monster2 = "GreenMushroom";
-					self.monster3 = "BlueMushroom";
-					break;
-				case 3 :
-					self.theme = "깊은 숲";
-					self.monster1 = "Resh";
-					self.monster2 = "Harf";
-					self.monster3 = "Steezy";
-					break;
-				case 4 :
-					self.theme = "어두운 동굴";
-					self.monster1 = "DualBurk";
-					self.monster2 = "Ghost";
-					self.monster3 = "Dragon";
-					break;
-				case 5 :
-					self.theme = "슬라임 본거지";
-					self.monster1 = null;
-					self.monster2 = null;
-					self.monster3 = null;
-					self.monster.push(new Boss());
-					self.waveEndTime = 1000000;
-					break;
-			}
+			case 1 :
+			self.theme = "달팽이 농장"
+				self.monster1 = "Snail";
+				self.monster2 = "BlueSnail";
+				self.monster3 = "RedSnail";
+				break;
+			case 2 :
+				self.theme = "버섯 골짜기";
+				self.monster1 = "OrangeMushroom";
+				self.monster2 = "GreenMushroom";
+				self.monster3 = "BlueMushroom";
+				break;
+			case 3 :
+				self.theme = "깊은 숲";
+				self.monster1 = "Resh";
+				self.monster2 = "Harf";
+				self.monster3 = "Steezy";
+				break;
+			case 4 :
+				self.theme = "어두운 동굴";
+				self.monster1 = "DualBurk";
+				self.monster2 = "Ghost";
+				self.monster3 = "Dragon";
+				break;
+			case 5 :
+				self.theme = "슬라임 본거지";
+				self.monster1 = "Slime";
+				self.monster2 = "Slime";
+				self.monster3 = "Slime";
+				self.difficulty = 1;
+				self.monster.push(new Boss());
+				self.waveEndTime = 1000000;
+				break;
+		}
+	self.waveDelay = 6000 - (self.difficulty/5)*150-(self.difficulty%5)*200
 	updateInterval = window.setInterval("manager.update()",1000/60);
 	self.waveStartTime = performance.now();
 	self.waveTime = performance.now()-3000;
@@ -796,6 +720,26 @@ CanvasManager.prototype.reStart = function(){	// 재시작
 	self.addKeyEvent();
 }
 
+CanvasManager.prototype.setTheme = function() {
+	var self = this;
+	switch(self.themeNum){
+				case 1 :
+					self.theme = "달팽이 농장";
+					break;
+				case 2 :
+					self.theme = "버섯 골짜기";
+					break;
+				case 3 :
+					self.theme = "깊은 숲";
+					break;
+				case 4 :
+					self.theme = "어두운 동굴";
+					break;
+				case 5 :
+					self.theme = "슬라임 본거지";
+					break;
+			}
+}
 
 
 
@@ -879,7 +823,7 @@ Monster.prototype.init = function() {	// 초기화
 		case "Slime" :
 			this.width = 69;
 			this.height = 47;
-			this.hp = 100;
+			this.maxHp = 100;
 			this.point = 50;
 			this.vx = -2.5;
 			this.img = images.Slime;
@@ -887,7 +831,7 @@ Monster.prototype.init = function() {	// 초기화
 		case "Snail" :
 			this.width = 37;
 			this.height = 26;
-			this.hp = 30;
+			this.maxHp = 30;
 			this.point = 10;
 			this.vx = -3.25;
 			this.img = images.Snail;
@@ -895,7 +839,7 @@ Monster.prototype.init = function() {	// 초기화
 		case "RedSnail" :
 			this.width = 35*1.1;
 			this.height = 34*1.1;
-			this.hp = 80;
+			this.maxHp = 80;
 			this.point = 30;
 			this.vx = -3;
 			this.img = images.RedSnail;
@@ -903,7 +847,7 @@ Monster.prototype.init = function() {	// 초기화
 		case "BlueSnail" :
 			this.width = 35*1.1;
 			this.height = 34*1.1;
-			this.hp = 50;
+			this.maxHp = 50;
 			this.point = 20;
 			this.vx = -2.75;
 			this.img = images.BlueSnail;
@@ -911,7 +855,7 @@ Monster.prototype.init = function() {	// 초기화
 		case "OrangeMushroom" :
 			this.width = 63;
 			this.height = 58;
-			this.hp = 150;
+			this.maxHp = 150;
 			this.point = 60;
 			this.vx = -3;
 			this.img = images.OrangeMushroom;
@@ -919,7 +863,7 @@ Monster.prototype.init = function() {	// 초기화
 		case "GreenMushroom" :
 			this.width = 56;
 			this.height = 52;
-			this.hp = 200;
+			this.maxHp = 200;
 			this.point = 80;
 			this.vx = -3.75;
 			this.img = images.GreenMushroom;
@@ -927,7 +871,7 @@ Monster.prototype.init = function() {	// 초기화
 		case "BlueMushroom" :
 			this.width = 63;
 			this.height = 58;
-			this.hp = 300;
+			this.maxHp = 300;
 			this.point = 100;
 			this.vx = -3.5;
 			this.img = images.BlueMushroom;
@@ -935,7 +879,7 @@ Monster.prototype.init = function() {	// 초기화
 		case "Steezy" :
 			this.width = 46;
 			this.height = 30;
-			this.hp = 200;
+			this.maxHp = 200;
 			this.point = 120;
 			this.vx = -3;
 			this.vy = 2;
@@ -945,7 +889,7 @@ Monster.prototype.init = function() {	// 초기화
 		case "Resh" :
 			this.width = 64;
 			this.height = 54;
-			this.hp = 500;
+			this.maxHp = 500;
 			this.point = 60;
 			this.vx = -2.5;
 			this.img = images.Resh;
@@ -953,7 +897,7 @@ Monster.prototype.init = function() {	// 초기화
 		case "Harf" :
 			this.width = 68;
 			this.height = 96;
-			this.hp = 900;
+			this.maxHp = 900;
 			this.point = 85;
 			this.vx = -3;
 			this.img = images.Harf;
@@ -961,7 +905,7 @@ Monster.prototype.init = function() {	// 초기화
 		case "Threetale" :
 			this.width = 95;
 			this.height = 75;
-			this.hp = 1500;
+			this.maxHp = 1500;
 			this.point = 120;
 			this.img = images.Threetale;
 			this.vx = -3;
@@ -969,7 +913,7 @@ Monster.prototype.init = function() {	// 초기화
 		case "DualBurk" :
 			this.width = 92;
 			this.height = 70;
-			this.hp = 2500;
+			this.maxHp = 2500;
 			this.point = 200;
 			this.vx = -2.5;
 			this.img = images.DualBurk;
@@ -977,7 +921,7 @@ Monster.prototype.init = function() {	// 초기화
 		case "Ghost" :
 			this.width = 63;
 			this.height = 91;
-			this.hp = 7000;
+			this.maxHp = 7000;
 			this.point = 300;
 			this.vx = -2.2;
 			this.img = images.Ghost;
@@ -985,13 +929,13 @@ Monster.prototype.init = function() {	// 초기화
 		case "Dragon" :
 			this.width = 76;
 			this.height = 53;
-			this.hp = 13000;
+			this.maxHp = 13000;
 			this.point = 460;
 			this.vx = -1.5;
 			this.img = images.Dragon;
 			break;
 		case null :
-			this.hp = 0;
+			this.maxHp = 0;
 			this.width = 0;
 			this.height = 0;
 			this.img = images.Slime;
@@ -1001,13 +945,14 @@ Monster.prototype.init = function() {	// 초기화
 		default :
 			this.width = 67;
 			this.height = 92;
-			this.hp = 30;
+			this.maxHp = 30;
 			this.point = 15;
 			this.vx = -3;
 			this.name = "Snail";
 			this.img = Images.Snail;
 			break;
 	}
+	this.hp = this.maxHp;
 
 }
 
@@ -1015,15 +960,12 @@ Monster.prototype.checkCollision = function() {	// 몬스터와 화살 충돌 �
 	var self = this;
 	var n =0;
 	manager.arrow.forEach(function (instance) {
-		var condition1 = self.x+self.width>instance.x && self.x<instance.x && self.y+self.height>instance.y && self.y<instance.y;
-		var condition2 = self.x<instance.x+instance.width && self.x+self.width>instance.x+instance.width && self.y+self.height>instance.y && self.y< instance.y;
-		var condition3 = self.x+self.width>instance.x && self.x < instance.x && self.y < instance.y + instance.height && self.y+self.height > instance.y+instance.height;
-		var condition4 = self.x<instance.x+instance.width && self.x+self.width > instance.x + instance.width && self.y < instance.y + instance.height && self.y + self.height > instance.y + instance.height;
-		if(condition1 || condition2 || condition3 || condition4){
+		var condition1 = instance.x < self.x + self.width && instance.x + instance.width > self.x;
+        var condition2 = instance.y < self.y + self.height && instance.y + instance.height > self.y;
+		if(condition1 && condition2){
 			self.hp-= instance.attackDamage;
 			manager.damage.push(new Damage(self.x+self.width/2,self.y,instance.attackDamage,instance.isCritical));
 			manager.arrow.splice(n,1);
-
 		}
 		n++;
 	});
@@ -1040,6 +982,15 @@ Monster.prototype.draw = function() {	// 몬스터 그리기
 	self.y += self.vy;
 
 	self.canvasCtx.drawImage(self.img,self.x,self.y,self.width,self.height);
+	self.hpDraw();
+}
+
+Monster.prototype.hpDraw = function() {
+	var self = this;
+	self.canvasCtx.strokeStyle = "#333333";
+	self.canvasCtx.strokeRect(self.x+self.width/2-25,self.y-15,50,7.5);
+	self.canvasCtx.fillStyle = "#cc0000";
+	self.canvasCtx.fillRect(self.x+self.width/2-25,self.y-15,self.hp/self.maxHp*50,7.5);
 }
 
 // Damage.js
@@ -1065,7 +1016,7 @@ Damage.prototype.draw = function() {
 }
 
 // Boss.js
-function Boss() {
+function Boss() {	// 보스
 	this.canvas = document.querySelector('.my-canvas');
 	this.canvasCtx = this.canvas.getContext('2d');
 	this.isBoss = true;
@@ -1073,8 +1024,8 @@ function Boss() {
 	this.y = 150;
 	this.width = 206*1.4;
 	this.height = 142*1.4
-	this.maxHp = 10000;
-	this.hp = 10000;
+	this.maxHp = 100000;
+	this.hp = this.maxHp;
 	this.point = 5000;
 	this.img = images.Slime;
 	this.attackDelay = 700;
@@ -1082,7 +1033,7 @@ function Boss() {
 	this.attackDeltaTime = 0;
 }
 
-Boss.prototype.checkAttack = function () {
+Boss.prototype.checkAttack = function () {	// 보스 공격 체크
 	var self = this;
 	this.attackDeltaTime = performance.now() - this.attackTime;
 	if(this.attackDelay<this.attackDeltaTime){
@@ -1091,7 +1042,7 @@ Boss.prototype.checkAttack = function () {
 	}
 }
 
-Boss.prototype.draw = function() {
+Boss.prototype.draw = function() {	// 보스 그리기
 	var self = this;
 	self.checkAttack();
 	self.hpDraw();
@@ -1099,7 +1050,7 @@ Boss.prototype.draw = function() {
 
 }
 
-Boss.prototype.hpDraw = function() {
+Boss.prototype.hpDraw = function() {	// 체력바 그리기
 	var self = this;
 	self.canvasCtx.strokeStyle = "#333333";
 	self.canvasCtx.strokeRect(200,10,600,20);
@@ -1111,11 +1062,9 @@ Boss.prototype.checkCollision = function() {	// 보스 몬스터와 화살 충�
 	var self = this;
 	var n =0;
 	manager.arrow.forEach(function (instance) {
-		var condition1 = self.x+self.width>instance.x && self.x<instance.x && self.y+self.height>instance.y && self.y<instance.y;
-		var condition2 = self.x<instance.x+instance.width && self.x+self.width>instance.x+instance.width && self.y+self.height>instance.y && self.y< instance.y;
-		var condition3 = self.x+self.width>instance.x && self.x < instance.x && self.y < instance.y + instance.height && self.y+self.height > instance.y+instance.height;
-		var condition4 = self.x<instance.x+instance.width && self.x+self.width > instance.x + instance.width && self.y < instance.y + instance.height && self.y + self.height > instance.y + instance.height;
-		if(condition1 || condition2 || condition3 || condition4){
+		var condition1 = instance.x < self.x + self.width && instance.x + instance.width > self.x;
+        var condition2 = instance.y < self.y + self.height && instance.y + instance.height > self.y;
+        if(condition1 && condition2){
 			self.hp-= instance.attackDamage;
 			manager.damage.push(new Damage(self.x+self.width/2,self.y,instance.attackDamage,instance.isCritical));
 			manager.arrow.splice(n,1);
@@ -1131,8 +1080,8 @@ function EnemyAttack(x,y,vx,vy,name,damage) {
 	this.canvasCtx = this.canvas.getContext('2d');
 	this.x = x;
 	this.y = y;
-	this.width = 195*0.5;
-	this.height = 184*0.5; 
+	this.width = 195*0.4;
+	this.height = 184*0.4; 
 	this.damage = damage;
 	this.vx = vx;
 	this.vy = vy;
