@@ -217,7 +217,7 @@ Img.prototype.init = function() {	// 이미지 로드
 	this.length++;
 	this.Background6.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Background6.png";
 	this.length++;
-	this.Stitch.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Stitch.jpg";
+	this.Stitch.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Stitch.png";
 	this.length++;
 	this.Star.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Star.png";
 	this.length++;
@@ -254,6 +254,12 @@ Img.prototype.init = function() {	// 이미지 로드
 }
 
 Img.prototype.addEvent = function() {	// 로드 이벤트 추가
+	this.Background1.addEventListener("load",imgOnLoad,false);
+	this.Background2.addEventListener("load",imgOnLoad,false);
+	this.Background3.addEventListener("load",imgOnLoad,false);
+	this.Background4.addEventListener("load",imgOnLoad,false);
+	this.Background5.addEventListener("load",imgOnLoad,false);
+	this.Background6.addEventListener("load",imgOnLoad,false);
 	this.Stitch.addEventListener("load",imgOnLoad,false);
 	this.Star.addEventListener("load",imgOnLoad,false);
 	this.Snail.addEventListener("load",imgOnLoad,false);
@@ -358,24 +364,25 @@ CanvasManager.prototype.update = function() {	// 업데이트
 }
 
 CanvasManager.prototype.setBackgroundImage = function() {	// 배경 이미지 세팅
+	var self = this;
 	switch(self.themeNum) {
 		case 1 :
-			self.backgroundImg = Img.Background1;
+			self.backgroundImg = images.Background1;
 			break;
 		case 2 :
-			self.backgroundImg = Img.Background2;
+			self.backgroundImg = images.Background2;
 			break;
 		case 3 :
-			self.backgroundImg = Img.Background3;
+			self.backgroundImg = images.Background3;
 			break;
 		case 4 :
-			self.backgroundImg = Img.Background4;
+			self.backgroundImg = images.Background4;
 			break;
 		case 5 :
-			self.backgroundImg = Img.Background5;
+			self.backgroundImg = images.Background5;
 			break;
 		case 6 :
-			self.backgroundImg = Img.Background6;
+			self.backgroundImg = images.Background6;
 			break;
 	}
 }
