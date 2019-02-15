@@ -342,6 +342,8 @@ CanvasManager.prototype.update = function() {	// 업데이트
 	self.canvasCtx.fillStyle = "rgba(255,255,255,1)";
 	self.canvasCtx.fillRect(0,0,1000,500);
 	self.canvasCtx.drawImage(self.backgroundImg,0,0,1000,500);
+	self.canvasCtx.fillStyle = "rgba(255,255,255,0.5)";
+	self.canvasCtx.fillRect(0,0,1000,500);
 	self.character.draw();
 	self.monster.forEach(function (instance){
 		instance.draw();
@@ -625,7 +627,7 @@ CanvasManager.prototype.checkWin = function() {	// 승리 확인
 		input.quit = true;
 	}
 	this.canvasCtx.font = "16px Arial";
-	this.canvasCtx.fillStyle = "#0095dd";
+	this.canvasCtx.fillStyle = "#0000cc";
 	this.canvasCtx.fillText("Progress: " + Math.floor((performance.now()-self.waveStartTime)/self.waveEndTime*100)+"%",850,20);
 }
 
@@ -646,7 +648,7 @@ CanvasManager.prototype.monsterHpCheck = function(n) {	// 몬스터 사망 확�
 CanvasManager.prototype.drawScore = function() {	// 점수 출력
 	var self = this;
 	this.canvasCtx.font = "16px Arial";
-	this.canvasCtx.fillStyle = "#0095DD";
+	this.canvasCtx.fillStyle = "#0000cc";
 	this.canvasCtx.fillText("Score: " + self.score,8,20);
 
 }
