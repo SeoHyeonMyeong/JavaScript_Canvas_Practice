@@ -176,6 +176,12 @@ var updateInterval;	// 인터벌
 
 // Img.js
 function Img() {	// 이미지
+	this.Background1 = new Image();
+	this.Background2 = new Image();
+	this.Background3 = new Image();
+	this.Background4 = new Image();
+	this.Background5 = new Image();
+	this.Background6 = new Image();
 	this.Stitch = new Image();
 	this.Star = new Image();
 	this.Snail = new Image();
@@ -199,6 +205,18 @@ function Img() {	// 이미지
 };
 
 Img.prototype.init = function() {	// 이미지 로드
+	this.Background1.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Background1.png";
+	this.length++;
+	this.Background2.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Background2.png";
+	this.length++;
+	this.Background3.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Background3.png";
+	this.length++;
+	this.Background4.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Background4.png";
+	this.length++;
+	this.Background5.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Background5.png";
+	this.length++;
+	this.Background6.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Background6.png";
+	this.length++;
 	this.Stitch.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Stitch.jpg";
 	this.length++;
 	this.Star.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Star.png";
@@ -302,6 +320,7 @@ function CanvasManager() {
 CanvasManager.prototype.init = function() {	// 캐릭터를 만들고 인터벌을 설정한다.
 	var self = this;
 	this.addKeyEvent();	// 키 이벤트 추가
+	this.setBackgroundImage();
 	updateInterval = window.setInterval("manager.update()",1000/60);	// 업데이트 인터벌 실행
 
 }
@@ -316,6 +335,7 @@ CanvasManager.prototype.update = function() {	// 업데이트
 	// 그리기
 	self.canvasCtx.fillStyle = "rgba(255,255,255,1)";
 	self.canvasCtx.fillRect(0,0,1000,500);
+	self.canvasCtx.drawImage(self.backgroundImg,0,0,1000,500);
 	self.character.draw();
 	self.monster.forEach(function (instance){
 		instance.draw();
@@ -334,6 +354,29 @@ CanvasManager.prototype.update = function() {	// 업데이트
 	// 종료
 	if(input.quit) {
 		self.quit();
+	}
+}
+
+CanvasManager.prototype.setBackgroundImage = function() {	// 배경 이미지 세팅
+	switch(self.themeNum) {
+		case 1 :
+			self.backgroundImg = Img.Background1;
+			break;
+		case 2 :
+			self.backgroundImg = Img.Background2;
+			break;
+		case 3 :
+			self.backgroundImg = Img.Background3;
+			break;
+		case 4 :
+			self.backgroundImg = Img.Background4;
+			break;
+		case 5 :
+			self.backgroundImg = Img.Background5;
+			break;
+		case 6 :
+			self.backgroundImg = Img.Background6;
+			break;
 	}
 }
 
@@ -712,12 +755,15 @@ CanvasManager.prototype.reStart = function(){	// 재시작
 				self.waveEndTime = 1000000;
 				break;
 		}
-	self.waveDelay = 6000 - (self.difficulty/5)*150-(self.difficulty%5)*200
-	updateInterval = window.setInterval("manager.update()",1000/60);
+	
+	self.waveDelay = 6000 - (self.difficulty/5)*150-(self.difficulty%5)*200;
+	self.setBackgroundImage();
 	self.waveStartTime = performance.now();
 	self.waveTime = performance.now()-3000;
 	self.removeMenuEvent();
 	self.addKeyEvent();
+	updateInterval = window.setInterval("manager.update()",1000/60);
+	
 }
 
 CanvasManager.prototype.setTheme = function() {
