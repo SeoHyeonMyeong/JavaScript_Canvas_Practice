@@ -199,6 +199,7 @@ function Img() {	// 이미지
 	this.Ghost = new Image();
 	this.Dragon = new Image();
 	this.Arrow = new Image();
+	this.ArrowCritical = new Image();
 	this.length = 0;
 	this.init();
 	this.addEvent();
@@ -251,6 +252,8 @@ Img.prototype.init = function() {	// 이미지 로드
 	this.length++;
 	this.Arrow.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Arrow.png";
 	this.length++;
+	this.ArrowCritical.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/ArrowCritical.png";
+	this.length++;
 }
 
 Img.prototype.addEvent = function() {	// 로드 이벤트 추가
@@ -277,6 +280,7 @@ Img.prototype.addEvent = function() {	// 로드 이벤트 추가
 	this.Ghost.addEventListener("load",imgOnLoad,false);
 	this.Dragon.addEventListener("load",imgOnLoad,false);
 	this.Arrow.addEventListener("load",imgOnLoad,false);
+	this.ArrowCritical.addEventListener("load",imgOnLoad,false);
 
 }
 
@@ -838,9 +842,10 @@ function Arrow(x,y,vx,vy,g,attackDamage,isCritical) {	// 화살
 	this.attackDamage = attackDamage;
 	this.isCritical = isCritical;
 	this.g = g;
-	this.width = 82;
-	this.height = 11;
+	this.width = 165*0.4;
+	this.height = 22*0.4;
 	this.img = images.Arrow;
+	if(isCritical) this.img = images.ArrowCritical;
 }
 
 Arrow.prototype.draw = function() {	// 화살 그리기
@@ -876,8 +881,8 @@ function Monster(x,y,name) {	// 몬스터
 Monster.prototype.init = function() {	// 초기화
 	switch(this.name) {
 		case "Slime" :
-			this.width = 69;
-			this.height = 47;
+			this.width = 206*0.35;
+			this.height = 142*0.35;
 			this.maxHp = 100;
 			this.point = 50;
 			this.vx = -2.5;
@@ -942,7 +947,7 @@ Monster.prototype.init = function() {	// 초기화
 			this.img = images.Steezy;
 			break; 
 		case "Resh" :
-			this.width = 64;
+			this.width = 62;
 			this.height = 54;
 			this.maxHp = 500;
 			this.point = 60;
@@ -950,8 +955,8 @@ Monster.prototype.init = function() {	// 초기화
 			this.img = images.Resh;
 			break;
 		case "Harf" :
-			this.width = 68;
-			this.height = 96;
+			this.width = 66;
+			this.height = 91;
 			this.maxHp = 900;
 			this.point = 85;
 			this.vx = -3;
@@ -966,8 +971,8 @@ Monster.prototype.init = function() {	// 초기화
 			this.vx = -3;
 			break;
 		case "DualBurk" :
-			this.width = 92;
-			this.height = 70;
+			this.width = 90;
+			this.height = 69;
 			this.maxHp = 2500;
 			this.point = 200;
 			this.vx = -2.5;
@@ -998,8 +1003,8 @@ Monster.prototype.init = function() {	// 초기화
 			this.point = 0;
 			break;
 		default :
-			this.width = 67;
-			this.height = 92;
+			this.width = 37;
+			this.height = 26;
 			this.maxHp = 30;
 			this.point = 15;
 			this.vx = -3;
@@ -1062,7 +1067,7 @@ function Damage(x,y,value,isCritical) {
 Damage.prototype.draw = function() {
 	var self = this;
 	this.canvasCtx.font = "16px Arial";
-	this.canvasCtx.fillStyle = "#0095DD";
+	this.canvasCtx.fillStyle = "#0000cc";
 	if(self.isCritical) {
 		this.canvasCtx.font = "20px Arial";
 		this.canvasCtx.fillStyle = "#ee00DD";
