@@ -182,7 +182,7 @@ function Img() {	// 이미지
 	this.Background4 = new Image();
 	this.Background5 = new Image();
 	this.Background6 = new Image();
-	this.Stitch = new Image();
+	this.Helena = new Image();
 	this.Star = new Image();
 	this.Snail = new Image();
 	this.BlueSnail = new Image();
@@ -218,7 +218,7 @@ Img.prototype.init = function() {	// 이미지 로드
 	this.length++;
 	this.Background6.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Background6.png";
 	this.length++;
-	this.Stitch.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Stitch.png";
+	this.Helena.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Helena.png";
 	this.length++;
 	this.Star.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Star.png";
 	this.length++;
@@ -263,7 +263,7 @@ Img.prototype.addEvent = function() {	// 로드 이벤트 추가
 	this.Background4.addEventListener("load",imgOnLoad,false);
 	this.Background5.addEventListener("load",imgOnLoad,false);
 	this.Background6.addEventListener("load",imgOnLoad,false);
-	this.Stitch.addEventListener("load",imgOnLoad,false);
+	this.Helena.addEventListener("load",imgOnLoad,false);
 	this.Star.addEventListener("load",imgOnLoad,false);
 	this.Snail.addEventListener("load",imgOnLoad,false);
 	this.BlueSnail.addEventListener("load",imgOnLoad,false);
@@ -808,9 +808,9 @@ function Character(x,y) {	// 캐릭터
 	this.canvasCtx = this.canvas.getContext('2d');
 	this.x = x;
 	this.y = y;
-	this.width = 80;
-	this.height = 96;
-	this.img = images.Stitch;
+	this.width = 159*0.4;
+	this.height = 187*0.4;
+	this.img = images.Helena;
 	this.speed = 4;
 }
 
