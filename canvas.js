@@ -169,6 +169,14 @@ function clickEvent(e) {	// 클릭 이벤트
 			
 		}
 	}
+	if(x>552&&x<881&&y>402&&y<432){	// 크리티컬 배율 증가
+		if(manager.criticalDamage<10&&manager.criticalDamage*5000<=manager.gold){
+			manager.gold -= manager.criticalDamage*5000;
+			manager.criticalDamage+=0.5;
+			manager.showMenu();
+			
+		}
+	}
 	
 }
 
@@ -302,9 +310,9 @@ function CanvasManager() {
 	this.ifWin = false; // 승리여부
 	this.maxDifficulty = 40;	// 최대난이도
 	this.score = 0;	// 스코어 0
-	this.gold = 0;	// 골드 0
+	this.gold = 500;	// 골드 0
 	this.attackDamage = 30;	// 데미지 30
-	this.agility = 60;	// 공격속도
+	this.agility = 80;	// 공격속도
 	this.critical = 0.1;	// 크리율
 	this.criticalDamage = 2;	// 크리 배율
 	this.arrowDelay = 60000 / this.agility;	// 화살 딜레이
@@ -435,10 +443,10 @@ CanvasManager.prototype.checkArrow = function() {	// 시간이 지났다면 화�
 		isCritical = true;
 	}
 	if(Math.random()>0){
-		vy = -6;
-		g = 0.2;
+		vy = -8;
+		g = 0.3;
 	}
-	var vx = 6;
+	var vx = 8.5;
 	if(input.space&&this.arrowDelay<this.arrowDeltaTime){
 		this.arrowTime = performance.now();
 		switch(self.arrowMulti){
@@ -446,26 +454,26 @@ CanvasManager.prototype.checkArrow = function() {	// 시간이 지났다면 화�
 				this.arrow.push(new Arrow(randomX,randomY,vx,vy,g,attackDamage,isCritical));
 				break;
 			case 2 :
-				vy = -5.75;
+				vy = -7.5;
 				this.arrow.push(new Arrow(randomX,randomY,vx,vy,g,attackDamage,isCritical));
-				vy = -6.25;
+				vy = -8.5;
 				this.arrow.push(new Arrow(randomX,randomY,vx,vy,g,attackDamage,isCritical));
 				break;
 			case 3 :
 				this.arrow.push(new Arrow(randomX,randomY,vx,vy,g,attackDamage,isCritical));
-				vy = -5.5;
+				vy = -7;
 				this.arrow.push(new Arrow(randomX,randomY,vx,vy,g,attackDamage,isCritical));
-				vy = -6.5;
+				vy = -9;
 				this.arrow.push(new Arrow(randomX,randomY,vx,vy,g,attackDamage,isCritical));
 				break;
 			case 4 :
-				vy = -5.75;
+				vy = -7.5;
 				this.arrow.push(new Arrow(randomX,randomY,vx,vy,g,attackDamage,isCritical));
-				vy = -6.25;
+				vy = -8.5;
 				this.arrow.push(new Arrow(randomX,randomY,vx,vy,g,attackDamage,isCritical));
-				vy = -5.25;
+				vy = -6.5;
 				this.arrow.push(new Arrow(randomX,randomY,vx,vy,g,attackDamage,isCritical));
-				vy = -6.75;
+				vy = -9.5;
 				this.arrow.push(new Arrow(randomX,randomY,vx,vy,g,attackDamage,isCritical));
 				break;
 			default :
@@ -643,7 +651,7 @@ CanvasManager.prototype.monsterHpCheck = function(n) {	// 몬스터 사망 확�
 		self.score += self.monster[n].point;
 		self.monster.splice(n,1);
 	}
-	if(self.monster[n].hp<=0){
+	else if(self.monster[n].hp<=0){
 		self.score += self.monster[n].point;
 		self.monster.splice(n,1);
 	} 
@@ -721,6 +729,8 @@ CanvasManager.prototype.showMenu = function() {	// 메뉴 출력
 	this.canvasCtx.fillText("멀티화살: " + self.arrowMulti + " (cost: " + self.arrowMulti*10000 + ")",500,190);
 	this.canvasCtx.fillStyle = "#5555ee";
 	this.canvasCtx.fillText("크리티컬확률: " + Math.floor(self.critical*100) + "% (cost: " + Math.floor(self.critical*100*100) + ")",500,240);
+	this.canvasCtx.fillStyle = "#5555ee";
+	this.canvasCtx.fillText("크리티컬배율: " + self.criticalDamage + " (cost: " + self.criticalDamage*5000 + ")",500,290);
 
 }
 
@@ -1023,8 +1033,9 @@ Monster.prototype.checkCollision = function() {	// 몬스터와 화살 충돌 �
 		var condition1 = instance.x < self.x + self.width && instance.x + instance.width > self.x;
         var condition2 = instance.y < self.y + self.height && instance.y + instance.height > self.y;
 		if(condition1 && condition2){
-			self.hp-= instance.attackDamage;
-			manager.damage.push(new Damage(self.x+self.width/2,self.y,instance.attackDamage,instance.isCritical));
+			var damaged = Math.floor(instance.attackDamage*0.8 + Math.random() * instance.attackDamage*0.4);
+			self.hp-= damaged
+			manager.damage.push(new Damage(self.x+self.width/2,self.y,damaged,instance.isCritical));
 			manager.arrow.splice(n,1);
 		}
 		n++;
