@@ -231,7 +231,7 @@ Img.prototype.init = function() {	// 이미지 로드
 	this.length++;
 	this.Star.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Star.png";
 	this.length++;
-	this.Wind.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Wind.png";
+	this.Wind.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Wind.PNG";
 	this.length++;
 	this.Snail.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Snail.png";
 	this.length++;
@@ -1226,9 +1226,9 @@ EnemyAttack.prototype.init = function() {
 			this.img = images.Star;
 			break;
 		case "Wind" :
-			this.width = 195*0.2;
-			this.height = 184*0.2;
-			this.img = images.Star;
+			this.width = 64*0.8;
+			this.height = 131*0.8;
+			this.img = images.Wind;
 			break;
 		default :
 			this.width = 195*0.4;
