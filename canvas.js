@@ -88,7 +88,7 @@ function menuKeyEvent(e) {	// 메뉴창에서 스페이스바 누를시 재시�
 		}
 	}
 	if(e.key==="ArrowRight"){
-		if(manager.themeNum<5){
+		if(manager.themeNum<6){
 			manager.themeNum++;
 			manager.setTheme();
 			manager.showMenu();
@@ -146,7 +146,7 @@ function clickEvent(e) {	// 클릭 이벤트
 		}
 	}
 	if(x>391&&x<411&&y>455&&y<477){	// 테마 우로
-		if(manager.themeNum<5){
+		if(manager.themeNum<6){
 			manager.themeNum++;
 			manager.setTheme();
 			manager.showMenu();
@@ -192,6 +192,7 @@ function Img() {	// 이미지
 	this.Background6 = new Image();
 	this.Helena = new Image();
 	this.Star = new Image();
+	this.Wind = new Image();
 	this.Snail = new Image();
 	this.BlueSnail = new Image();
 	this.RedSnail = new Image();
@@ -229,6 +230,8 @@ Img.prototype.init = function() {	// 이미지 로드
 	this.Helena.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Helena.png";
 	this.length++;
 	this.Star.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Star.png";
+	this.length++;
+	this.Wind.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Wind.png";
 	this.length++;
 	this.Snail.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Snail.png";
 	this.length++;
@@ -273,6 +276,7 @@ Img.prototype.addEvent = function() {	// 로드 이벤트 추가
 	this.Background6.addEventListener("load",imgOnLoad,false);
 	this.Helena.addEventListener("load",imgOnLoad,false);
 	this.Star.addEventListener("load",imgOnLoad,false);
+	this.Wind.addEventListener("load",imgOnLoad,false);
 	this.Snail.addEventListener("load",imgOnLoad,false);
 	this.BlueSnail.addEventListener("load",imgOnLoad,false);
 	this.RedSnail.addEventListener("load",imgOnLoad,false);
@@ -774,8 +778,17 @@ CanvasManager.prototype.reStart = function(){	// 재시작
 				self.monster2 = "Slime";
 				self.monster3 = "Slime";
 				self.difficulty = 1;
-				self.monster.push(new Boss());
-				self.waveEndTime = 1000000;
+				self.monster.push(new Boss("SlimeKing"));
+				self.waveEndTime = 10000000;
+				break;
+			case 6 :
+				self.theme = "하프 둥지";
+				self.monster1 = "Harf";
+				self.monster2 = "Harf";
+				self.monster3 = "Harf";
+				self.difficulty = 1;
+				self.monster.push(new Boss("HarfKing"));
+				self.waveEndTime = 10000000;
 				break;
 		}
 	
@@ -806,6 +819,9 @@ CanvasManager.prototype.setTheme = function() {
 					break;
 				case 5 :
 					self.theme = "슬라임 본거지";
+					break;
+				case 6 :
+					self.theme = "하프 둥지";
 					break;
 			}
 }
@@ -1087,21 +1103,65 @@ Damage.prototype.draw = function() {
 }
 
 // Boss.js
-function Boss() {	// 보스
+function Boss(name) {	// 보스
 	this.canvas = document.querySelector('.my-canvas');
 	this.canvasCtx = this.canvas.getContext('2d');
 	this.isBoss = true;
-	this.x = 700;
-	this.y = 150;
-	this.width = 206*1.4;
-	this.height = 142*1.4
-	this.maxHp = 100000;
-	this.hp = this.maxHp;
-	this.point = 5000;
-	this.img = images.Slime;
-	this.attackDelay = 700;
-	this.attackTime = performance.now();
-	this.attackDeltaTime = 0;
+	this.name = name;
+	this.init();
+}
+
+Boss.prototype.init = function() {
+	switch(this.name) {
+		case "SlimeKing" :
+			this.x = 700;
+			this.y = 150;
+			this.width = 206*1.4;
+			this.height = 142*1.4;
+			this.maxHp = 100000;
+			this.hp = this.maxHp;
+			this.point = 5000;
+			this.img = images.Slime;
+			this.attackDelay = 700;
+			this.attackTime = performance.now();
+			this.attackDeltaTime = 0;
+			this.attackName = "Star";
+			this.attackSpeed = -5;
+			this.attackDamage = 100;
+			break;
+		case "HarfKing" :
+			this.x = 800;
+			this.y = 100;
+			this.width = 66*3;
+			this.height = 91*3;
+			this.maxHp = 1200000;
+			this.hp = this.maxHp;
+			this.point = 10000;
+			this.img = images.Harf;
+			this.attackDelay = 800;
+			this.attackTime = performance.now();
+			this.attackDeltaTime = 0;
+			this.attackName = "Wind";
+			this.attackSpeed = -6;
+			this.attackDamage = 200;
+			break;
+		default :
+			this.x = 700;
+			this.y = 150;
+			this.width = 206*1.4;
+			this.height = 142*1.4;
+			this.maxHp = 100000;
+			this.hp = this.maxHp;
+			this.point = 5000;
+			this.img = images.Slime;
+			this.attackDelay = 700;;
+			this.attackTime = performance.now();
+			this.attackDeltaTime = 0;
+			this.attackName = "Star";
+			this.attackSpeed = -6;
+			this.attackDamage = 100;
+			break;
+	}
 }
 
 Boss.prototype.checkAttack = function () {	// 보스 공격 체크
@@ -1109,7 +1169,7 @@ Boss.prototype.checkAttack = function () {	// 보스 공격 체크
 	this.attackDeltaTime = performance.now() - this.attackTime;
 	if(this.attackDelay<this.attackDeltaTime){
 		self.attackTime = performance.now();
-		manager.EnemyAttack.push(new EnemyAttack(1000,Math.random()*450,-5,0,"Star",100));
+		manager.EnemyAttack.push(new EnemyAttack(1000,Math.random()*450,self.attackSpeed,0,self.attackName,self.attackDamage));
 	}
 }
 
@@ -1151,13 +1211,31 @@ function EnemyAttack(x,y,vx,vy,name,damage) {
 	this.canvasCtx = this.canvas.getContext('2d');
 	this.x = x;
 	this.y = y;
-	this.width = 195*0.4;
-	this.height = 184*0.4; 
-	this.damage = damage;
 	this.vx = vx;
 	this.vy = vy;
 	this.name = name;
-	this.img = images.Star;
+	this.damage = damage;
+	this.init();
+}
+
+EnemyAttack.prototype.init = function() {
+	switch(this.name) {
+		case "Star" :
+			this.width = 195*0.4;
+			this.height = 184*0.4; 
+			this.img = images.Star;
+			break;
+		case "Wind" :
+			this.width = 195*0.2;
+			this.height = 184*0.2;
+			this.img = images.Star;
+			break;
+		default :
+			this.width = 195*0.4;
+			this.height = 184*0.4; 
+			this.img = images.Star;
+			break;
+	}
 }
 
 EnemyAttack.prototype.draw = function() {
