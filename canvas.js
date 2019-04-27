@@ -323,7 +323,7 @@ function CanvasManager() {
 	this.ifWin = false; // 승리여부
 	this.maxDifficulty = 40;	// 최대난이도
 	this.score = 0;	// 스코어 
-	this.gold = 500;	// 골드 
+	this.gold = 100000;	// 골드 
 	this.attackDamage = 30;	// 데미지 30
 	this.agility = 80;	// 공격속도
 	this.critical = 0.1;	// 크리율
@@ -1062,7 +1062,7 @@ Monster.prototype.checkCollision = function() {	// 몬스터와 화살 충돌 �
 		if(condition1 && condition2){
 			var damaged = Math.floor(instance.attackDamage*0.8 + Math.random() * instance.attackDamage*0.4);
 			self.hp-= damaged
-			manager.damage.push(new Damage(self.x+self.width/2,self.y,damaged,instance.isCritical));
+			manager.damage.push(new Damage(self.x+self.width/2-10,self.y-10,damaged,instance.isCritical));
 			manager.arrow.splice(n,1);
 			self.knockBacked();
 		}
@@ -1081,7 +1081,9 @@ Monster.prototype.checkKnockBacked = function() {	// 넉백 체크
 	var self = this;
 	self.tempVx = self.vx;
 	if(performance.now()-self.knockBackStartTime<80){
-		self.vx = self.knockBackLevel
+		if(self.knockBackLevel!=0){
+			self.vx = self.knockBackLevel
+		}
 	}
 }
 
@@ -1114,6 +1116,7 @@ function Damage(x,y,value,isCritical) {
 	this.canvasCtx = this.canvas.getContext('2d');
 	this.x = x;
 	this.y = y;
+	this.vy = -1.2;
 	this.time = performance.now();
 	this.value = value;
 	this.isCritical = isCritical;
@@ -1121,6 +1124,7 @@ function Damage(x,y,value,isCritical) {
 
 Damage.prototype.draw = function() {
 	var self = this;
+	self.y += self.vy;
 	this.canvasCtx.font = "16px Arial";
 	this.canvasCtx.fillStyle = "#0000cc";
 	if(self.isCritical) {
@@ -1224,10 +1228,11 @@ Boss.prototype.checkCollision = function() {	// 보스 몬스터와 화살 충�
 		var condition1 = instance.x < self.x + self.width && instance.x + instance.width > self.x;
         var condition2 = instance.y < self.y + self.height && instance.y + instance.height > self.y;
         if(condition1 && condition2){
-			self.hp-= instance.attackDamage;
-			manager.damage.push(new Damage(self.x+self.width/2,self.y,instance.attackDamage,instance.isCritical));
+			var damaged = Math.floor(instance.attackDamage*0.8 + Math.random() * instance.attackDamage*0.4);
+			self.hp-= damaged
+			manager.damage.push(new Damage(self.x+self.width/2-10,self.y-10,damaged,instance.isCritical));
 			manager.arrow.splice(n,1);
-		}
+			}
 		n++;
 	});
 
