@@ -177,6 +177,15 @@ function clickEvent(e) {	// 클릭 이벤트
 			
 		}
 	}
+	if(x>552&&x<881&&y>452&&y<482){	// 넉백률 증가
+		if(manager.knockBack<10&&(manager.knockBack+1)*1000<=manager.gold){
+			manager.gold -= (manager.knockBack+1)*1000;
+			manager.knockBack+=1;
+			manager.showMenu();
+			
+		}
+	}
+
 	
 }
 
@@ -313,12 +322,13 @@ function CanvasManager() {
 	this.theme = "달팽이 농장";
 	this.ifWin = false; // 승리여부
 	this.maxDifficulty = 40;	// 최대난이도
-	this.score = 0;	// 스코어 0
-	this.gold = 500;	// 골드 0
+	this.score = 0;	// 스코어 
+	this.gold = 500;	// 골드 
 	this.attackDamage = 30;	// 데미지 30
 	this.agility = 80;	// 공격속도
 	this.critical = 0.1;	// 크리율
 	this.criticalDamage = 2;	// 크리 배율
+	this.knockBack = 0;			// 넉백
 	this.arrowDelay = 60000 / this.agility;	// 화살 딜레이
 	this.arrowDeltaTime = 0;	// 화살 델타타임
 	this.arrowTime = performance.now(); // 화살 시간
@@ -530,7 +540,7 @@ CanvasManager.prototype.monsterWave = function() {	// 몬스터 웨이브
 			break;
 		case 10 :
 			templevel = Math.random()<0.75? 3:4;
-			wavelevel = Math.random()<0.3? 1:templevel;
+			wavelevel = Math.random()<0.3? 2:templevel;
 			break;
 		default :
 			break;
@@ -735,7 +745,8 @@ CanvasManager.prototype.showMenu = function() {	// 메뉴 출력
 	this.canvasCtx.fillText("크리티컬확률: " + Math.floor(self.critical*100) + "% (cost: " + Math.floor(self.critical*100*100) + ")",500,240);
 	this.canvasCtx.fillStyle = "#5555ee";
 	this.canvasCtx.fillText("크리티컬배율: " + self.criticalDamage + " (cost: " + self.criticalDamage*5000 + ")",500,290);
-
+	this.canvasCtx.fillStyle = "#5555ee";
+	this.canvasCtx.fillText("넉백: " + self.knockBack + " (cost: " + (self.knockBack+1)*1000 +")",500,340);
 }
 
 CanvasManager.prototype.reStart = function(){	// 재시작
@@ -1053,14 +1064,30 @@ Monster.prototype.checkCollision = function() {	// 몬스터와 화살 충돌 �
 			self.hp-= damaged
 			manager.damage.push(new Damage(self.x+self.width/2,self.y,damaged,instance.isCritical));
 			manager.arrow.splice(n,1);
+			self.knockBacked();
 		}
 		n++;
 	});
 
 }
 
+Monster.prototype.knockBacked = function() {	// 몬스터 넉백
+	var self = this;
+	self.knockBackStartTime = performance.now();
+	self.knockBackLevel = manager.knockBack;
+}
+
+Monster.prototype.checkKnockBacked = function() {	// 넉백 체크
+	var self = this;
+	self.tempVx = self.vx;
+	if(performance.now()-self.knockBackStartTime<80){
+		self.vx = self.knockBackLevel
+	}
+}
+
 Monster.prototype.draw = function() {	// 몬스터 그리기
 	var self = this;
+	self.checkKnockBacked();
 	if(performance.now()-self.initTime>self.vyChangeTime){
 		self.initTime = performance.now();
 		self.vy = -self.vy;
@@ -1070,6 +1097,7 @@ Monster.prototype.draw = function() {	// 몬스터 그리기
 
 	self.canvasCtx.drawImage(self.img,self.x,self.y,self.width,self.height);
 	self.hpDraw();
+	self.vx = self.tempVx;	// 넉백당시 이동속도 다시 변경
 }
 
 Monster.prototype.hpDraw = function() {
