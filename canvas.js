@@ -154,25 +154,27 @@ function clickEvent(e) {	// 클릭 이벤트
 		}
 	}
 	if(x>552&&x<881&&y>302&&y<332){	// 멀티화살 증가
-		if(manager.arrowMulti<4&&manager.arrowMulti*10000<=manager.gold){
-			manager.gold -= manager.arrowMulti*10000;
+		if(manager.arrowMulti<4&&(manager.arrowMulti+1)*10000<=manager.gold){
+			manager.gold -= (manager.arrowMulti+1)*10000;
 			manager.arrowMulti++;
 			manager.showMenu();
 			
 		}
 	}
 	if(x>552&&x<881&&y>353&&y<381){	// 크리티컬 확률 증가
-		if(manager.critical<0.5&&manager.critical*10000<=manager.gold){
-			manager.gold -= manager.critical*10000;
-			manager.critical+=0.02;
+		if(manager.critical<0.7&&manager.criticalPrice<=manager.gold){
+			manager.gold -= manager.criticalPrice;
+			manager.critical += 0.02;
+			manager.criticalPrice += 2000;
 			manager.showMenu();
 			
 		}
 	}
 	if(x>552&&x<881&&y>402&&y<432){	// 크리티컬 배율 증가
-		if(manager.criticalDamage<10&&manager.criticalDamage*5000<=manager.gold){
-			manager.gold -= manager.criticalDamage*5000;
-			manager.criticalDamage+=0.5;
+		if(manager.criticalDamage<10&&manager.criticalDamagePrice<=manager.gold){
+			manager.gold -= manager.criticalDamagePrice;
+			manager.criticalDamage += 0.5;
+			manager.criticalDamagePrice += 10000;
 			manager.showMenu();
 			
 		}
@@ -321,13 +323,15 @@ function CanvasManager() {
 	this.themeNum = 1;
 	this.theme = "달팽이 농장";
 	this.ifWin = false; // 승리여부
-	this.maxDifficulty = 40;	// 최대난이도
+	this.maxDifficulty = 45;	// 최대난이도
 	this.score = 0;	// 스코어 
-	this.gold = 100000;	// 골드 
+	this.gold = 0;	// 골드 
 	this.attackDamage = 30;	// 데미지 30
 	this.agility = 80;	// 공격속도
 	this.critical = 0.1;	// 크리율
+	this.criticalPrice = 1000;	// 크리율 가격
 	this.criticalDamage = 2;	// 크리 배율
+	this.criticalDamagePrice = 10000 // 크리 배율 가격
 	this.knockBack = 0;			// 넉백
 	this.arrowDelay = 60000 / this.agility;	// 화살 딜레이
 	this.arrowDeltaTime = 0;	// 화살 델타타임
@@ -342,6 +346,7 @@ function CanvasManager() {
 	this.monster2 = "BlueSnail";
 	this.monster3 = "RedSnail";
 	this.character = new Character(20,20);
+	this.pet = new Pet(20,60,"Star");
 	this.arrow = [];
 	this.monster = [];
 	this.damage = [];
@@ -360,6 +365,7 @@ CanvasManager.prototype.init = function() {	// 캐릭터를 만들고 인터벌�
 CanvasManager.prototype.update = function() {	// 업데이트
 	var self = this;
 	self.checkArrow();	// 화살 확인
+	self.checkPetArrow();	// 펫 화살 확인
 	self.monsterWave();	// 몬스터 웨이브 확인
 	self.checkCollision();	// 충돌 확인
 	self.checkDamage();	// 데미지 확인
@@ -371,6 +377,7 @@ CanvasManager.prototype.update = function() {	// 업데이트
 	self.canvasCtx.fillStyle = "rgba(255,255,255,0.5)";
 	self.canvasCtx.fillRect(0,0,1000,500);
 	self.character.draw();
+	self.pet.draw();
 	self.monster.forEach(function (instance){
 		instance.draw();
 	});
@@ -496,6 +503,26 @@ CanvasManager.prototype.checkArrow = function() {	// 시간이 지났다면 화�
 	}
 }
 
+CanvasManager.prototype.checkPetArrow = function() {
+	var self = this;
+	self.pet.arrowDeltaTime = performance.now() - self.pet.arrowTime;
+	var randomX = self.pet.x+self.pet.width/2-10;
+	var randomY = self.pet.y+self.pet.height/2-10;
+	var vy = 0;
+	var g = 0;
+	var attackDamage = self.pet.attackDamage
+	var isCritical = false;
+	if(Math.random()<self.pet.critical){
+		attackDamage *= self.pet.criticalDamage;
+		isCritical = true;
+	}
+	var vx = 10;
+	if(this.pet.arrowDelay<this.pet.arrowDeltaTime){
+		this.pet.arrowTime = performance.now();
+		this.arrow.push(new Arrow(randomX,randomY,vx,vy,g,attackDamage,isCritical));
+	}
+}
+
 CanvasManager.prototype.monsterWave = function() {	// 몬스터 웨이브
 	var self = this;
 	var wavelevel = 0;
@@ -542,10 +569,12 @@ CanvasManager.prototype.monsterWave = function() {	// 몬스터 웨이브
 			templevel = Math.random()<0.75? 3:4;
 			wavelevel = Math.random()<0.3? 2:templevel;
 			break;
+		case 11 :
+			wavelevel = Math.random()<0.5? 3:4;
 		default :
 			break;
 	}
-	
+	self.waveDelay = 6000 - (self.difficulty/5)*100;
 
 	if(this.waveDelay<this.waveDeltaTime){
 		this.waveTime = performance.now();
@@ -555,7 +584,7 @@ CanvasManager.prototype.monsterWave = function() {	// 몬스터 웨이브
 	 				self.spawnMonster(1000+i*150,Math.random()*420);
 				}
 				break;
-			case 1 :	// 1 단계 : 3마리 + 1열로 4~6마리 + 랜덤 2마리 >> 총 9~11
+			case 1 :	// 1 단계 : 3마리 + 1열로 4~6마리 + 랜덤 1마리 >> 총 8~10
 				self.spawnMonster(1000,Math.random()*420);
 				self.spawnMonster(1300,Math.random()*420);
 				self.spawnMonster(1450,Math.random()*420);
@@ -563,19 +592,19 @@ CanvasManager.prototype.monsterWave = function() {	// 몬스터 웨이브
 				for(var i =0; i<ran;i++){
 					self.spawnMonster(1150,30+Math.random()*60+i*60);
 				}
-				for(var i=0;i<2;i++){ 	//랜덤으로 2마리 생성
+				for(var i=0;i<1;i++){ 	//랜덤으로 1마리 생성
 					self.spawnMonster(1000+Math.random()*450,Math.random()*420);
 				}
 
 				break;
-			case 2 :	// 2 단계 : 1마리 + 8*2마리 + 랜덤 7마리 >> 총 22
+			case 2 :	// 2 단계 : 1마리 + 8*2마리 + 랜덤 5마리 >> 총 20
 				self.spawnMonster(1000,Math.random()*420);
 				for(var i=0;i<8;i++){
 					for(var j=0;j<2;j++){
-						self.spawnMonster(1150+i*150,190+j*80);
+						self.spawnMonster(1150+i*150,150+j*80);
 					}
 				}
-				for(var i=0;i<7;i++){ 	//랜덤으로 7마리 생성
+				for(var i=0;i<5;i++){ 	//랜덤으로 5마리 생성
 					self.spawnMonster(1000+Math.random()*420,Math.random()*420);
 				}
 				break;
@@ -740,11 +769,11 @@ CanvasManager.prototype.showMenu = function() {	// 메뉴 출력
 	this.canvasCtx.fillText("지역: " + self.theme , 20,340);
 	this.canvasCtx.fillText("◀ ▶",300,340);
 	this.canvasCtx.fillStyle = "#bea312";
-	this.canvasCtx.fillText("멀티화살: " + self.arrowMulti + " (cost: " + self.arrowMulti*10000 + ")",500,190);
+	this.canvasCtx.fillText("멀티화살: " + self.arrowMulti + " (cost: " + (self.arrowMulti+1)*10000 + ")",500,190);
 	this.canvasCtx.fillStyle = "#5555ee";
-	this.canvasCtx.fillText("크리티컬확률: " + Math.floor(self.critical*100) + "% (cost: " + Math.floor(self.critical*100*100) + ")",500,240);
+	this.canvasCtx.fillText("크리티컬확률: " + Math.floor(self.critical*100) + "% (cost: " + self.criticalPrice + ")",500,240);
 	this.canvasCtx.fillStyle = "#5555ee";
-	this.canvasCtx.fillText("크리티컬배율: " + self.criticalDamage + " (cost: " + self.criticalDamage*5000 + ")",500,290);
+	this.canvasCtx.fillText("크리티컬배율: " + self.criticalDamage + " (cost: " + self.criticalDamagePrice + ")",500,290);
 	this.canvasCtx.fillStyle = "#5555ee";
 	this.canvasCtx.fillText("넉백: " + self.knockBack + " (cost: " + (self.knockBack+1)*1000 +")",500,340);
 }
@@ -754,6 +783,8 @@ CanvasManager.prototype.reStart = function(){	// 재시작
 	self.score = 0;
 	self.character.x = 20;
 	self.character.y = 20;
+	self.pet.x = 20;
+	self.pet.y = 60;
 	self.monster = [];
 	self.arrow = [];
 	self.EnemyAttack = [];
@@ -1236,6 +1267,50 @@ Boss.prototype.checkCollision = function() {	// 보스 몬스터와 화살 충�
 		n++;
 	});
 
+}
+
+// Pet.js
+function Pet(x,y,name) {		// 펫
+	this.canvas = document.querySelector('.my-canvas');
+	this.canvasCtx = this.canvas.getContext('2d');
+	this.x = x;
+	this.y = y;
+	this.vx = 0;
+	this.vy = 0;
+	this.name = name;
+	this.arrowDelay = 2000;
+	this.arrowDeltaTime = 0;
+	this.arrowTime = performance.now();
+	this.attackDamage = 100;
+	this.critical = 0.25;
+	this.criticalDamage = 2;
+	this.img = images.Star;
+	this.width = 195*0.2;
+	this.height = 184*0.2;
+}
+
+Pet.prototype.draw = function() {		// 펫 그리기
+	var self = this;
+	self.setMoving();
+	self.x += self.vx;
+	self.y += self.vy;
+	self.canvasCtx.drawImage(self.img,self.x,self.y,self.width,self.height);
+}
+
+Pet.prototype.setMoving = function () {		// 펫 이동속도 결정
+	var self = this;
+	if(manager.character.x-self.x<40 && manager.character.x-self.x>-40-manager.character.width/2){
+		self.vx = 0;
+	}
+	else {
+		self.vx = (manager.character.x-self.x)/20;
+	}
+	if(manager.character.y-self.y<20 && manager.character.y-self.y>-20-manager.character.height/2){
+		self.vy = 0;
+	}
+	else {
+		self.vy = (manager.character.y-self.y)/20;
+	}
 }
 
 // EnemyAttack.js
