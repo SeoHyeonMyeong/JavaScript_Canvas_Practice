@@ -187,7 +187,14 @@ function clickEvent(e) {	// 클릭 이벤트
 			
 		}
 	}
-
+	if(x>552&&x<881&&y>502&&y<532){	// 실드 개수 증가
+		if(manager.shieldNum<9&&(manager.shieldNum)*5000<=manager.gold){
+			manager.gold -= (manager.shieldNum)*5000;
+			manager.shieldNum+=1;
+			manager.showMenu();
+			
+		}
+	}
 	
 }
 
@@ -279,6 +286,7 @@ Img.prototype.init = function() {	// 이미지 로드
 	this.length++;
 	this.Shield.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Shield.png";
 	this.length++;
+}
 
 Img.prototype.addEvent = function() {	// 로드 이벤트 추가
 	this.Background1.addEventListener("load",imgOnLoad,false);
@@ -327,7 +335,7 @@ function CanvasManager() {
 	this.ifWin = false; // 승리여부
 	this.maxDifficulty = 45;	// 최대난이도
 	this.score = 0;	// 스코어 
-	this.gold = 0;	// 골드 
+	this.gold = 500;	// 골드 
 	this.attackDamage = 30;	// 데미지 30
 	this.agility = 80;	// 공격속도
 	this.critical = 0.1;	// 크리율
@@ -356,6 +364,7 @@ function CanvasManager() {
 	this.damage = [];
 	this.EnemyAttack = [];
 	this.init();
+	this.shield.push(new Shield(0));
 }
 
 CanvasManager.prototype.init = function() {	// 캐릭터를 만들고 인터벌을 설정한다.
@@ -363,7 +372,6 @@ CanvasManager.prototype.init = function() {	// 캐릭터를 만들고 인터벌�
 	this.addKeyEvent();	// 키 이벤트 추가
 	this.setBackgroundImage();
 	updateInterval = window.setInterval("manager.update()",1000/60);	// 업데이트 인터벌 실행
-
 }
 
 CanvasManager.prototype.update = function() {	// 업데이트
@@ -382,6 +390,9 @@ CanvasManager.prototype.update = function() {	// 업데이트
 	self.canvasCtx.fillRect(0,0,1000,500);
 	self.character.draw();
 	self.pet.draw();
+	self.shield.forEach(function (instance){
+		instance.draw();
+	})
 	self.monster.forEach(function (instance){
 		instance.draw();
 	});
@@ -780,6 +791,8 @@ CanvasManager.prototype.showMenu = function() {	// 메뉴 출력
 	this.canvasCtx.fillText("크리티컬배율: " + self.criticalDamage + " (cost: " + self.criticalDamagePrice + ")",500,290);
 	this.canvasCtx.fillStyle = "#5555ee";
 	this.canvasCtx.fillText("넉백: " + self.knockBack + " (cost: " + (self.knockBack+1)*1000 +")",500,340);
+	this.canvasCtx.fillStyle = "#5555ee";
+	this.canvasCtx.fillText("실드: " + self.shieldNum + " (cost: " + (self.shieldNum)*5000 +")",500,390);
 }
 
 CanvasManager.prototype.reStart = function(){	// 재시작
@@ -791,6 +804,10 @@ CanvasManager.prototype.reStart = function(){	// 재시작
 	self.pet.y = 60;
 	self.monster = [];
 	self.arrow = [];
+	self.shield = [];
+	for(var i=0;i<self.shieldNum;i++){
+		self.shield.push(new Shield(i*Math.PI/self.shieldNum*2));
+	}
 	self.EnemyAttack = [];
 	self.waveEndTime = 30000;
 	switch(self.themeNum){
@@ -1088,10 +1105,10 @@ Monster.prototype.init = function() {	// 초기화
 
 }
 
-Monster.prototype.checkCollision = function() {	// 몬스터와 화살 충돌 이벤트
+Monster.prototype.checkCollision = function() {	// 몬스터 충돌 이벤트
 	var self = this;
-	var n =0;
-	manager.arrow.forEach(function (instance) {
+	var n = 0;
+	manager.arrow.forEach(function (instance) {		// 화살 충돌 이벤트
 		var condition1 = instance.x < self.x + self.width && instance.x + instance.width > self.x;
         var condition2 = instance.y < self.y + self.height && instance.y + instance.height > self.y;
 		if(condition1 && condition2){
@@ -1103,8 +1120,19 @@ Monster.prototype.checkCollision = function() {	// 몬스터와 화살 충돌 �
 		}
 		n++;
 	});
-
+	n = 0;
+	manager.shield.forEach(function (instance) {	// 실드 충돌 이벤트
+		var condition1 = instance.x < self.x + self.width && instance.x + instance.width > self.x;
+        var condition2 = instance.y < self.y + self.height && instance.y + instance.height > self.y;
+		if(condition1 && condition2){
+			manager.damage.push(new Damage(self.x+self.width/2-10,self.y-10,self.hp,true));
+			self.hp = 0
+			manager.shield.splice(n,1);
+		}
+		n++;
+	});
 }
+
 
 Monster.prototype.knockBacked = function() {	// 몬스터 넉백
 	var self = this;
@@ -1317,13 +1345,16 @@ Pet.prototype.setMoving = function () {		// 펫 이동속도 결정
 	}
 }
 
-function Shield() {
+function Shield(Theta) {
 	this.canvas = document.querySelector('.my-canvas');
 	this.canvasCtx = this.canvas.getContext('2d');
 	this.x = 0;
 	this.y = 0;
 	this.vx = 0;
 	this.vy = 0;
+	this.r = 75;
+	this.Theta = Theta;
+	this.vTheta = Math.PI/48;
 	this.name = "shield";
 	this.img = images.Shield;
 	this.width = 1446*0.02;
@@ -1332,16 +1363,15 @@ function Shield() {
 
 Shield.prototype.draw = function() {
 	var self = this;
-	self.setMoving();
-	self.x += self.vx;
-	self.y += self.vy;
+	self.setPosition();
 	self.canvasCtx.drawImage(self.img,self.x,self.y,self.width,self.height);
 }
 
-Shield.prototype.setMoving = function() {
+Shield.prototype.setPosition = function() {
 	var self = this;
-	self.vx = Math.cos((manager.character.x+manager.character.width/2-self.x-self.width/2)/30)*30;
-	self.vy = Math.sin((manager.character.y+manager.character.height/2-self.y-self.height/2)/30)*30;
+	self.Theta += self.vTheta
+	self.x = manager.character.x + manager.character.width/2 - self.width/2 - Math.cos(self.Theta)*self.r;
+	self.y = manager.character.y + manager.character.height/2 - self.height/2 - Math.sin(self.Theta)*self.r;
 }
 
 // EnemyAttack.js
@@ -1391,4 +1421,4 @@ var imglength=0;
 var images;
 document.addEventListener("DOMContentLoaded",function() {	// 로드시 이벤트
 	images = new Img();
-})
+});
