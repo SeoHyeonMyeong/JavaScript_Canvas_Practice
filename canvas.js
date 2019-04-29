@@ -220,6 +220,7 @@ function Img() {	// 이미지
 	this.Dragon = new Image();
 	this.Arrow = new Image();
 	this.ArrowCritical = new Image();
+	this.Shield = new Image();
 	this.length = 0;
 	this.init();
 	this.addEvent();
@@ -276,7 +277,8 @@ Img.prototype.init = function() {	// 이미지 로드
 	this.length++;
 	this.ArrowCritical.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/ArrowCritical.png";
 	this.length++;
-}
+	this.Shield.src="https://raw.githubusercontent.com/SeoHyeonMyeong/JavaScript_Canvas_Practice/master/images/Shield.png";
+	this.length++;
 
 Img.prototype.addEvent = function() {	// 로드 이벤트 추가
 	this.Background1.addEventListener("load",imgOnLoad,false);
@@ -304,7 +306,7 @@ Img.prototype.addEvent = function() {	// 로드 이벤트 추가
 	this.Dragon.addEventListener("load",imgOnLoad,false);
 	this.Arrow.addEventListener("load",imgOnLoad,false);
 	this.ArrowCritical.addEventListener("load",imgOnLoad,false);
-
+	this.Shield.addEventListener("load",imgOnLoad,false);
 }
 
 function imgOnLoad() {	// 로드 이벤트 , 로드 완료시 매니저 실행
@@ -333,6 +335,7 @@ function CanvasManager() {
 	this.criticalDamage = 2;	// 크리 배율
 	this.criticalDamagePrice = 10000 // 크리 배율 가격
 	this.knockBack = 0;			// 넉백
+	this.shieldNum = 1;			// 실드 개수
 	this.arrowDelay = 60000 / this.agility;	// 화살 딜레이
 	this.arrowDeltaTime = 0;	// 화살 델타타임
 	this.arrowTime = performance.now(); // 화살 시간
@@ -340,13 +343,14 @@ function CanvasManager() {
 	this.waveDelay = 6000;	// 웨이브 딜레이
 	this.waveDeltaTime = 0;	// 웨이브 델타타임
 	this.waveTime = performance.now()-3000;	// 웨이브 시간
-	this.waveStartTime = performance.now();
-	this.waveEndTime = 30000;
+	this.waveStartTime = performance.now();	// 라운드 시작 시간
+	this.waveEndTime = 30000;	// 라운드 끝나는 시간
 	this.monster1 = "Snail";
 	this.monster2 = "BlueSnail";
 	this.monster3 = "RedSnail";
 	this.character = new Character(20,20);
 	this.pet = new Pet(20,60,"Star");
+	this.shield = [];
 	this.arrow = [];
 	this.monster = [];
 	this.damage = [];
@@ -1313,6 +1317,33 @@ Pet.prototype.setMoving = function () {		// 펫 이동속도 결정
 	}
 }
 
+function Shield() {
+	this.canvas = document.querySelector('.my-canvas');
+	this.canvasCtx = this.canvas.getContext('2d');
+	this.x = 0;
+	this.y = 0;
+	this.vx = 0;
+	this.vy = 0;
+	this.name = "shield";
+	this.img = images.Shield;
+	this.width = 1446*0.02;
+	this.height = 1442*0.02;
+}
+
+Shield.prototype.draw = function() {
+	var self = this;
+	self.setMoving();
+	self.x += self.vx;
+	self.y += self.vy;
+	self.canvasCtx.drawImage(self.img,self.x,self.y,self.width,self.height);
+}
+
+Shield.prototype.setMoving = function() {
+	var self = this;
+	self.vx = Math.cos((manager.character.x+manager.character.width/2-self.x-self.width/2)/30)*30;
+	self.vy = Math.sin((manager.character.y+manager.character.height/2-self.y-self.height/2)/30)*30;
+}
+
 // EnemyAttack.js
 function EnemyAttack(x,y,vx,vy,name,damage) {
 	this.canvas = document.querySelector('.my-canvas');
@@ -1360,5 +1391,4 @@ var imglength=0;
 var images;
 document.addEventListener("DOMContentLoaded",function() {	// 로드시 이벤트
 	images = new Img();
-});
-
+})
